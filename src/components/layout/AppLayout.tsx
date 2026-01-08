@@ -7,10 +7,17 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="flex min-h-screen scanlines">
+    <div className="flex min-h-screen soft-bg relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="bubble-decoration bubble-1" />
+      <div className="bubble-decoration bubble-2" />
+      <div className="bubble-decoration bubble-3" />
+      
       <Sidebar />
-      <main className="flex-1 p-6 overflow-auto matrix-bg">
-        {children}
+      <main className="flex-1 p-8 overflow-auto relative z-10">
+        <div className="max-w-6xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );
