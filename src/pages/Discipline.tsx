@@ -19,8 +19,7 @@ export default function Discipline() {
 
   const handleTimeRangeChange = (range: '7d' | '30d' | '90d') => {
     setSelectedTimeRange(range);
-    const daysMap: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90 };
-    setTimeRange(daysMap[range] as 7 | 30 | 90);
+    setTimeRange(range);
   };
 
   // Calculate overall discipline score
