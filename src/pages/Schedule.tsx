@@ -1,13 +1,21 @@
 import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
+import CreateEventDialog from '@/components/schedule/CreateEventDialog';
 import { useSchedule } from '@/hooks/useSchedule';
+import { useGoals } from '@/hooks/useGoals';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { format, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const HOUR_SLOTS = Array.from({ length: 16 }, (_, i) => i + 6); // 6 AM to 9 PM
 
 export default function Schedule() {
+  const { user } = useAuth();
+  const { categories } = useGoals();
+  const { toast } = useToast();
   const { 
     weekDays, 
     weekStart, 
@@ -16,7 +24,8 @@ export default function Schedule() {
     goToNextWeek, 
     goToPrevWeek, 
     goToToday,
-    getEventsForDay 
+    getEventsForDay,
+    refetch
   } = useSchedule();
 
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
@@ -31,6 +40,47 @@ export default function Schedule() {
       'Daily': 'hsl(120 100% 45%)',
     };
     return colors[category] || 'hsl(120 60% 40%)';
+  };
+
+  const handleCreateEvent = async (eventData: {
+    title: string;
+    description: string;
+    date: string;
+    start_time: string;
+    end_time: string;
+    category_id: string;
+    is_recurring: boolean;
+  }) => {
+    if (!user) return;
+
+    // Create as a goal with target_date (events are stored as goals)
+    const { error } = await supabase
+      .from('goals')
+      .insert({
+        user_id: user.id,
+        title: eventData.title,
+        description: eventData.description || null,
+        category_id: eventData.category_id,
+        target_date: eventData.date,
+        is_daily: eventData.is_recurring,
+        progress: 0
+      });
+
+    if (error) {
+      toast({
+        title: 'ERROR',
+        description: 'Failed to create event',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'EVENT_CREATED',
+      description: `"${eventData.title}" has been scheduled.`
+    });
+
+    refetch();
   };
 
   return (
@@ -48,6 +98,11 @@ export default function Schedule() {
           </div>
           
           <div className="flex items-center gap-4">
+            <CreateEventDialog 
+              categories={categories}
+              selectedDate={selectedDay || undefined}
+              onCreateEvent={handleCreateEvent}
+            />
             <button
               onClick={goToToday}
               className="matrix-btn text-xs py-2 px-4"
@@ -186,14 +241,30 @@ export default function Schedule() {
           ))}
         </div>
 
-        {/* Coming Soon Notice */}
-        <div className="mt-8 glass-card p-6 text-center animate-fade-in-up stagger-4">
-          <p className="text-muted-foreground font-mono text-sm mb-2">
-            // GOOGLE_CALENDAR_SYNC_MODULE
-          </p>
-          <p className="text-xs text-muted-foreground">
-            External calendar integration coming soon. Events will sync automatically.
-          </p>
+        {/* Google Calendar Integration Notice */}
+        <div className="mt-8 glass-card p-6 animate-fade-in-up stagger-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <ExternalLink className="w-4 h-4 text-primary" />
+                <p className="text-muted-foreground font-mono text-sm">
+                  // GOOGLE_CALENDAR_SYNC
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Connect your Google Calendar to sync external events automatically.
+              </p>
+            </div>
+            <button 
+              className="matrix-btn text-xs py-2 px-4"
+              onClick={() => toast({
+                title: 'COMING_SOON',
+                description: 'Google Calendar integration will be available soon.'
+              })}
+            >
+              CONNECT
+            </button>
+          </div>
         </div>
       </div>
     </AppLayout>
