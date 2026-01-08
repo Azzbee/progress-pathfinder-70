@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { Sparkles, Heart, Target, Flame } from 'lucide-react';
 
-const emailSchema = z.string().email('Invalid email address');
-const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
+const emailSchema = z.string().email('Please enter a valid email');
+const passwordSchema = z.string().min(6, 'Password needs at least 6 characters');
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -57,14 +58,14 @@ export default function Auth() {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: 'ACCESS DENIED',
+            title: 'Oops!',
             description: error.message,
             variant: 'destructive',
           });
         } else {
           toast({
-            title: 'ACCESS GRANTED',
-            description: 'Welcome back, operator.',
+            title: 'Welcome back! 🎉',
+            description: 'Great to see you again.',
           });
         }
       } else {
@@ -72,21 +73,21 @@ export default function Auth() {
         if (error) {
           if (error.message.includes('already registered')) {
             toast({
-              title: 'USER EXISTS',
-              description: 'This identity is already in the system.',
+              title: 'Already registered',
+              description: 'This email is already in use.',
               variant: 'destructive',
             });
           } else {
             toast({
-              title: 'REGISTRATION FAILED',
+              title: 'Registration failed',
               description: error.message,
               variant: 'destructive',
             });
           }
         } else {
           toast({
-            title: 'IDENTITY CREATED',
-            description: 'Welcome to the system, operator.',
+            title: 'Welcome aboard! 🚀',
+            description: 'Your journey to discipline starts now.',
           });
         }
       }
@@ -96,102 +97,132 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center scanlines matrix-bg p-4">
-      <div className="w-full max-w-md">
-        {/* Terminal header */}
-        <div className="border border-primary p-4 mb-0">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-3 h-3 rounded-full bg-destructive" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-primary" />
-          </div>
-          <h1 className="heading-serif text-3xl text-primary matrix-glow text-center">
-            DISCIPLINE_OS
-          </h1>
-          <p className="text-muted-foreground text-center text-sm mt-1">
-            // {isLogin ? 'AUTHENTICATE' : 'CREATE_IDENTITY'}
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center p-4 soft-bg relative overflow-hidden">
+      {/* Decorative floating shapes */}
+      <div className="bubble-decoration bubble-1" />
+      <div className="bubble-decoration bubble-2" />
+      <div className="bubble-decoration bubble-3" />
+      
+      {/* Floating icons */}
+      <div className="absolute top-20 left-[15%] animate-bounce-soft opacity-30">
+        <Sparkles className="w-8 h-8 text-primary" />
+      </div>
+      <div className="absolute top-40 right-[20%] animate-bounce-soft opacity-30" style={{ animationDelay: '0.5s' }}>
+        <Heart className="w-6 h-6 text-accent" />
+      </div>
+      <div className="absolute bottom-32 left-[25%] animate-bounce-soft opacity-30" style={{ animationDelay: '1s' }}>
+        <Target className="w-7 h-7 text-primary" />
+      </div>
 
-        {/* Form container */}
-        <div className="border border-t-0 border-primary p-6 card-hover">
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="w-full max-w-md relative z-10">
+        {/* Card */}
+        <div className="glass-card p-8 animate-fade-in-up">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent mb-4 shadow-glow">
+              <Flame className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="heading-display text-3xl text-foreground">
+              DisciplineOS
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              {isLogin ? 'Welcome back!' : 'Start your journey'}
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-primary">
-                  USERNAME_
+              <div className="space-y-2 animate-fade-in">
+                <Label htmlFor="username" className="text-foreground font-medium">
+                  Username
                 </Label>
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="bg-background border-primary/50 focus:border-primary text-primary placeholder:text-muted-foreground"
-                  placeholder="neo"
+                  className="soft-input"
+                  placeholder="What should we call you?"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-primary">
-                EMAIL_
+              <Label htmlFor="email" className="text-foreground font-medium">
+                Email
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-background border-primary/50 focus:border-primary text-primary placeholder:text-muted-foreground"
-                placeholder="operator@matrix.io"
+                className="soft-input"
+                placeholder="hello@example.com"
               />
               {errors.email && (
-                <p className="text-destructive text-xs">{errors.email}</p>
+                <p className="text-destructive text-sm">{errors.email}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-primary">
-                PASSWORD_
+              <Label htmlFor="password" className="text-foreground font-medium">
+                Password
               </Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-background border-primary/50 focus:border-primary text-primary placeholder:text-muted-foreground"
+                className="soft-input"
                 placeholder="••••••••"
               />
               {errors.password && (
-                <p className="text-destructive text-xs">{errors.password}</p>
+                <p className="text-destructive text-sm">{errors.password}</p>
               )}
             </div>
 
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/80 matrix-glow font-bold"
+              className="w-full soft-btn h-12 text-base mt-6"
             >
-              {isSubmitting ? 'PROCESSING...' : isLogin ? 'LOGIN' : 'REGISTER'}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Please wait...
+                </span>
+              ) : (
+                isLogin ? 'Sign In' : 'Create Account'
+              )}
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          {/* Toggle */}
+          <div className="mt-8 text-center">
             <button
               type="button"
               onClick={() => {
                 setIsLogin(!isLogin);
                 setErrors({});
               }}
-              className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              className="text-muted-foreground hover:text-primary transition-colors"
             >
-              {isLogin ? '// CREATE_NEW_IDENTITY' : '// EXISTING_USER_LOGIN'}
+              {isLogin ? (
+                <>Don't have an account? <span className="text-primary font-semibold">Sign up</span></>
+              ) : (
+                <>Already have an account? <span className="text-primary font-semibold">Sign in</span></>
+              )}
             </button>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-4 text-center text-muted-foreground text-xs">
-          <span className="terminal-cursor">SYSTEM READY</span>
+        {/* Footer decoration */}
+        <div className="mt-6 text-center">
+          <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            Build better habits, one day at a time
+          </p>
         </div>
       </div>
     </div>
