@@ -7,6 +7,7 @@ import CreateGoalDialog from '@/components/dashboard/CreateGoalDialog';
 import { useGoals } from '@/hooks/useGoals';
 import { useStreak } from '@/hooks/useStreak';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Target, Sparkles } from 'lucide-react';
 
 export default function Dashboard() {
   const { goals, categories, loading: goalsLoading, createGoal, toggleTask, deleteGoal } = useGoals();
@@ -43,11 +44,11 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="heading-serif text-3xl text-primary matrix-glow">
-              GOAL_PLANNER
+            <h1 className="heading-display text-3xl text-primary">
+              Goal Planner
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              // Track your objectives and build discipline
+              Track your objectives and build discipline
             </p>
           </div>
           <CreateGoalDialog categories={categories} onCreateGoal={createGoal} />
@@ -57,8 +58,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {isLoading ? (
             <>
-              <Skeleton className="h-48 bg-muted" />
-              <Skeleton className="h-48 bg-muted" />
+              <Skeleton className="h-48 bg-muted rounded-3xl" />
+              <Skeleton className="h-48 bg-muted rounded-3xl" />
             </>
           ) : (
             <>
@@ -80,12 +81,15 @@ export default function Dashboard() {
 
         {/* Goals List */}
         <div>
-          <h2 className="heading-serif text-xl text-primary mb-4">ACTIVE_GOALS</h2>
+          <h2 className="heading-display text-xl text-foreground mb-4 flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            Active Goals
+          </h2>
           
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-24 bg-muted" />
+                <Skeleton key={i} className="h-24 bg-muted rounded-3xl" />
               ))}
             </div>
           ) : goals.length > 0 ? (
@@ -98,7 +102,7 @@ export default function Dashboard() {
                   description={goal.description || undefined}
                   progress={goal.progress}
                   categoryName={goal.category?.name || 'Uncategorized'}
-                  categoryColor={goal.category?.color || '#00ff00'}
+                  categoryColor={goal.category?.color || 'hsl(200 85% 55%)'}
                   targetDate={goal.target_date || undefined}
                   tasks={goal.tasks}
                   onToggleTask={toggleTask}
@@ -107,11 +111,14 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="border border-primary/30 p-8 text-center">
-              <p className="text-muted-foreground">
-                // NO_GOALS_FOUND
+            <div className="glass-card rounded-3xl p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-primary" />
+              </div>
+              <p className="text-foreground font-display text-lg mb-2">
+                Ready to start your journey?
               </p>
-              <p className="text-muted-foreground text-sm mt-2">
+              <p className="text-muted-foreground text-sm">
                 Create your first goal to begin tracking your discipline.
               </p>
             </div>

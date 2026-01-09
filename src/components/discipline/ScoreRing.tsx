@@ -15,11 +15,9 @@ export default function ScoreRing({
   maxScore = 10, 
   size = 'lg',
   label,
-  color,
   animated = true
 }: ScoreRingProps) {
   const [displayScore, setDisplayScore] = useState(0);
-  const [mounted, setMounted] = useState(false);
 
   const sizeMap = {
     sm: { width: 80, stroke: 6, fontSize: 'text-lg' },
@@ -35,7 +33,6 @@ export default function ScoreRing({
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   useEffect(() => {
-    setMounted(true);
     if (!animated) {
       setDisplayScore(score);
       return;
@@ -60,78 +57,37 @@ export default function ScoreRing({
   }, [score, animated]);
 
   const getScoreColor = () => {
-    if (color) return color;
-    if (displayScore >= 8) return 'hsl(120 100% 45%)'; // Excellent - green
-    if (displayScore >= 6) return 'hsl(60 100% 50%)'; // Good - yellow
-    if (displayScore >= 4) return 'hsl(30 100% 50%)'; // Average - orange
-    return 'hsl(0 85% 50%)'; // Needs work - red
+    if (displayScore >= 8) return 'hsl(200 85% 55%)';
+    if (displayScore >= 6) return 'hsl(45 100% 50%)';
+    if (displayScore >= 4) return 'hsl(30 100% 50%)';
+    return 'hsl(0 85% 50%)';
   };
 
   return (
     <div className="relative flex items-center justify-center" style={{ width, height: width }}>
-      {/* Background ring */}
       <svg className="absolute transform -rotate-90" width={width} height={width}>
-        <circle
-          cx={width / 2}
-          cy={width / 2}
-          r={radius}
-          fill="none"
-          stroke="hsl(120 15% 12%)"
-          strokeWidth={stroke}
-        />
+        <circle cx={width / 2} cy={width / 2} r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} className="opacity-30" />
       </svg>
       
-      {/* Progress ring */}
-      <svg 
-        className={cn(
-          "absolute transform -rotate-90 transition-all duration-1000",
-          mounted && "opacity-100"
-        )} 
-        width={width} 
-        height={width}
-      >
-        <defs>
-          <filter id={`glow-${label || 'main'}`}>
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
+      <svg className="absolute transform -rotate-90" width={width} height={width}>
         <circle
-          cx={width / 2}
-          cy={width / 2}
-          r={radius}
+          cx={width / 2} cy={width / 2} r={radius}
           fill="none"
           stroke={getScoreColor()}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={animated ? strokeDashoffset : circumference - (score / maxScore) * circumference}
-          filter={`url(#glow-${label || 'main'})`}
-          style={{
-            transition: animated ? 'stroke-dashoffset 1.5s ease-out' : 'none'
-          }}
+          strokeDashoffset={strokeDashoffset}
+          style={{ transition: 'stroke-dashoffset 1.5s ease-out', filter: `drop-shadow(0 0 8px ${getScoreColor()})` }}
         />
       </svg>
 
-      {/* Inner content */}
       <div className="flex flex-col items-center justify-center z-10">
-        <span 
-          className={cn("font-mono font-bold matrix-glow", fontSize)}
-          style={{ color: getScoreColor() }}
-        >
+        <span className={cn("font-display font-bold", fontSize)} style={{ color: getScoreColor() }}>
           {displayScore.toFixed(1)}
         </span>
-        {label && (
-          <span className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-            {label}
-          </span>
-        )}
-        <span className="text-xs text-muted-foreground font-mono opacity-50">
-          / {maxScore.toFixed(1)}
-        </span>
+        {label && <span className="text-xs text-muted-foreground mt-1">{label}</span>}
+        <span className="text-xs text-muted-foreground opacity-50">/ {maxScore.toFixed(1)}</span>
       </div>
     </div>
   );
