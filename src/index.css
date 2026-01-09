@@ -4,71 +4,71 @@
 
 /* ============================================
    DisciplineOS Design System
-   Light Blue-White Airy Aesthetic
+   Flowing Water Aesthetic
    ============================================ */
 
 @layer base {
   :root {
-    /* Soft Cloud White Background */
-    --background: 210 40% 98%;
-    --foreground: 210 25% 25%;
+    /* Deep Ocean Background */
+    --background: 200 25% 96%;
+    --foreground: 200 30% 20%;
 
-    /* Cards - Pure white with subtle warmth */
+    /* Cards - Frosted glass */
     --card: 0 0% 100%;
-    --card-foreground: 210 25% 25%;
+    --card-foreground: 200 30% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 25% 25%;
+    --popover-foreground: 200 30% 20%;
 
-    /* Primary - Soft Sky Blue */
-    --primary: 200 85% 55%;
+    /* Primary - Ocean Blue */
+    --primary: 195 85% 45%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light lavender blue */
-    --secondary: 210 30% 94%;
-    --secondary-foreground: 210 25% 35%;
+    /* Secondary - Seafoam */
+    --secondary: 175 40% 90%;
+    --secondary-foreground: 195 50% 30%;
 
-    /* Muted - Gentle gray-blue */
-    --muted: 210 20% 92%;
-    --muted-foreground: 210 15% 50%;
+    /* Muted - Misty blue */
+    --muted: 195 20% 90%;
+    --muted-foreground: 195 20% 45%;
 
-    /* Accent - Bright aqua */
-    --accent: 185 70% 50%;
+    /* Accent - Aquamarine */
+    --accent: 175 65% 45%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Soft coral */
-    --destructive: 0 70% 60%;
+    /* Destructive - Coral reef */
+    --destructive: 15 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 210 25% 88%;
-    --input: 210 20% 95%;
-    --ring: 200 85% 55%;
+    --border: 195 30% 85%;
+    --input: 195 25% 94%;
+    --ring: 195 85% 45%;
 
-    /* Nice rounded corners */
-    --radius: 16px;
+    /* Organic rounded corners */
+    --radius: 20px;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 210 25% 35%;
-    --sidebar-primary: 200 85% 55%;
+    --sidebar-background: 200 30% 98%;
+    --sidebar-foreground: 195 30% 30%;
+    --sidebar-primary: 195 85% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 30% 96%;
-    --sidebar-accent-foreground: 200 85% 45%;
-    --sidebar-border: 210 25% 92%;
-    --sidebar-ring: 200 85% 55%;
+    --sidebar-accent: 175 40% 94%;
+    --sidebar-accent-foreground: 195 70% 35%;
+    --sidebar-border: 195 25% 90%;
+    --sidebar-ring: 195 85% 45%;
 
-    /* Category Colors - Soft pastels */
-    --category-physical: 145 60% 50%;
-    --category-social: 200 75% 55%;
-    --category-financial: 45 85% 55%;
-    --category-career: 260 60% 60%;
-    --category-mental: 320 55% 55%;
+    /* Category Colors - Ocean palette */
+    --category-physical: 160 55% 45%;
+    --category-social: 195 70% 50%;
+    --category-financial: 45 80% 50%;
+    --category-career: 220 60% 55%;
+    --category-mental: 280 50% 55%;
 
-    /* Decorative gradients */
-    --gradient-sky: linear-gradient(135deg, hsl(200 85% 55% / 0.1), hsl(185 70% 50% / 0.1));
-    --gradient-cloud: linear-gradient(180deg, hsl(210 40% 98%), hsl(200 30% 96%));
-    --gradient-accent: linear-gradient(135deg, hsl(200 85% 55%), hsl(185 70% 50%));
+    /* Water gradients */
+    --gradient-ocean: linear-gradient(180deg, hsl(195 85% 45% / 0.08) 0%, hsl(175 65% 45% / 0.12) 100%);
+    --gradient-wave: linear-gradient(135deg, hsl(195 85% 55% / 0.15), hsl(175 60% 50% / 0.08));
+    --gradient-depth: linear-gradient(180deg, hsl(200 25% 96%) 0%, hsl(195 35% 92%) 50%, hsl(185 30% 94%) 100%);
   }
 }
 
@@ -83,8 +83,8 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Nunito', 'Calibri', sans-serif;
-    font-weight: 400;
+    font-family: 'Quicksand', 'Nunito', sans-serif;
+    font-weight: 500;
     letter-spacing: 0.01em;
     line-height: 1.7;
   }
@@ -95,91 +95,209 @@
    ============================================ */
 
 .heading-display {
-  font-family: 'Quicksand', 'Calibri', sans-serif;
-  font-weight: 600;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .font-body {
-  font-family: 'Nunito', 'Calibri', sans-serif;
+  font-family: 'Quicksand', 'Nunito', sans-serif;
+  font-weight: 500;
 }
 
 /* ============================================
-   Decorative Shapes & Backgrounds
+   Water & Wave Decorations
    ============================================ */
 
-/* Floating bubble decoration */
+/* Animated wave layers */
+.wave-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background-repeat: repeat-x;
+  animation: wave-flow 12s linear infinite;
+}
+
+.wave-1 {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%230ea5e9' fill-opacity='0.06' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,186.7C960,192,1056,160,1152,144C1248,128,1344,128,1392,128L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background-size: 50% 100%;
+  opacity: 0.8;
+  animation-duration: 18s;
+}
+
+.wave-2 {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2314b8a6' fill-opacity='0.05' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,224C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background-size: 50% 100%;
+  opacity: 0.6;
+  animation-duration: 14s;
+  animation-direction: reverse;
+  bottom: -10px;
+}
+
+.wave-3 {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2306b6d4' fill-opacity='0.04' d='M0,288L48,272C96,256,192,224,288,218.7C384,213,480,235,576,245.3C672,256,768,256,864,234.7C960,213,1056,171,1152,165.3C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background-size: 50% 100%;
+  opacity: 0.5;
+  animation-duration: 20s;
+  bottom: -20px;
+}
+
+@keyframes wave-flow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Floating bubbles */
 .bubble-decoration {
   position: fixed;
   border-radius: 50%;
-  background: linear-gradient(135deg, hsl(200 85% 55% / 0.08), hsl(185 70% 50% / 0.05));
   pointer-events: none;
   z-index: 0;
 }
 
 .bubble-1 {
-  width: 400px;
-  height: 400px;
-  top: -100px;
-  right: -100px;
-  animation: float 20s ease-in-out infinite;
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  right: -150px;
+  background: radial-gradient(circle at 30% 30%, hsl(195 85% 55% / 0.12), hsl(175 65% 50% / 0.04) 60%, transparent 70%);
+  animation: bubble-float 25s ease-in-out infinite;
 }
 
 .bubble-2 {
-  width: 300px;
-  height: 300px;
-  bottom: 100px;
-  left: -150px;
-  animation: float 25s ease-in-out infinite reverse;
+  width: 350px;
+  height: 350px;
+  bottom: 15%;
+  left: -100px;
+  background: radial-gradient(circle at 40% 40%, hsl(175 70% 50% / 0.1), hsl(195 60% 55% / 0.03) 60%, transparent 70%);
+  animation: bubble-float 30s ease-in-out infinite reverse;
 }
 
 .bubble-3 {
-  width: 200px;
-  height: 200px;
-  top: 40%;
-  right: 10%;
-  animation: float 18s ease-in-out infinite 2s;
+  width: 250px;
+  height: 250px;
+  top: 35%;
+  right: 5%;
+  background: radial-gradient(circle at 35% 35%, hsl(185 75% 50% / 0.08), transparent 60%);
+  animation: bubble-float 22s ease-in-out infinite 3s;
 }
 
-/* Wave decoration */
-.wave-decoration {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 200px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%233b82f6' fill-opacity='0.05' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
-  background-size: cover;
-  pointer-events: none;
-  z-index: 0;
+.bubble-4 {
+  width: 180px;
+  height: 180px;
+  top: 60%;
+  left: 15%;
+  background: radial-gradient(circle at 30% 30%, hsl(195 80% 60% / 0.06), transparent 55%);
+  animation: bubble-float 28s ease-in-out infinite 5s reverse;
 }
 
-/* Soft gradient background */
-.soft-bg {
-  background: linear-gradient(180deg, hsl(210 40% 98%) 0%, hsl(200 30% 96%) 100%);
+@keyframes bubble-float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0.8;
+  }
+  25% { 
+    transform: translate(20px, -30px) scale(1.02); 
+    opacity: 1;
+  }
+  50% { 
+    transform: translate(-10px, -15px) scale(0.98); 
+    opacity: 0.7;
+  }
+  75% { 
+    transform: translate(-25px, -40px) scale(1.01); 
+    opacity: 0.9;
+  }
 }
 
-/* Dotted pattern background */
-.dot-pattern {
-  background-image: radial-gradient(hsl(200 85% 55% / 0.1) 1px, transparent 1px);
-  background-size: 24px 24px;
+/* Ripple effect on hover */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: hsl(195 85% 55% / 0.15);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.ripple-effect:hover::after {
+  width: 300%;
+  height: 300%;
+}
+
+/* Water droplet shape */
+.droplet-shape {
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* Organic blob shapes */
+.blob-water {
+  border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
+  animation: blob-morph 15s ease-in-out infinite;
+}
+
+@keyframes blob-morph {
+  0%, 100% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; }
+  25% { border-radius: 50% 60% 40% 50% / 60% 40% 50% 50%; }
+  50% { border-radius: 40% 50% 60% 50% / 50% 50% 40% 60%; }
+  75% { border-radius: 50% 40% 50% 60% / 40% 60% 50% 50%; }
+}
+
+/* Water background gradient */
+.water-bg {
+  background: linear-gradient(
+    180deg, 
+    hsl(200 25% 97%) 0%, 
+    hsl(195 30% 95%) 30%,
+    hsl(185 25% 94%) 60%,
+    hsl(195 35% 92%) 100%
+  );
+}
+
+/* Subtle water caustics pattern */
+.caustics-pattern {
+  background-image: 
+    radial-gradient(ellipse at 20% 30%, hsl(195 80% 60% / 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, hsl(175 70% 55% / 0.03) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, hsl(185 75% 55% / 0.02) 0%, transparent 60%);
+  animation: caustics-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes caustics-shimmer {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
 /* ============================================
    Animations
    ============================================ */
 
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(10px, -20px) rotate(2deg); }
-  50% { transform: translate(-5px, -10px) rotate(-1deg); }
-  75% { transform: translate(-15px, -25px) rotate(1deg); }
-}
-
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(25px);
   }
   to {
     opacity: 1;
@@ -195,7 +313,7 @@
 @keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-25px);
   }
   to {
     opacity: 1;
@@ -206,7 +324,7 @@
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
   to {
     opacity: 1;
@@ -214,149 +332,213 @@
   }
 }
 
-@keyframes bounce-soft {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
 }
 
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 1; 
+    box-shadow: 0 0 20px hsl(195 85% 55% / 0.2);
+  }
+  50% { 
+    opacity: 0.85; 
+    box-shadow: 0 0 35px hsl(195 85% 55% / 0.35);
+  }
 }
 
-@keyframes shimmer {
+@keyframes shimmer-flow {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
 /* Animation classes */
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+  animation: fade-in-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.5s ease-out forwards;
 }
 
 .animate-slide-in-left {
-  animation: slide-in-left 0.5s ease-out forwards;
+  animation: slide-in-left 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-scale-in {
-  animation: scale-in 0.3s ease-out forwards;
+  animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.animate-bounce-soft {
-  animation: bounce-soft 2s ease-in-out infinite;
+.animate-float {
+  animation: float-gentle 4s ease-in-out infinite;
 }
 
-.animate-pulse-soft {
-  animation: pulse-soft 2s ease-in-out infinite;
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, hsl(200 85% 55% / 0.1), transparent);
+  background: linear-gradient(90deg, transparent, hsl(195 85% 55% / 0.12), transparent);
   background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
+  animation: shimmer-flow 2.5s linear infinite;
+}
+
+.animate-sway {
+  animation: sway 6s ease-in-out infinite;
 }
 
 /* Staggered animation delays */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-.stagger-5 { animation-delay: 0.5s; }
+.stagger-1 { animation-delay: 0.08s; }
+.stagger-2 { animation-delay: 0.16s; }
+.stagger-3 { animation-delay: 0.24s; }
+.stagger-4 { animation-delay: 0.32s; }
+.stagger-5 { animation-delay: 0.4s; }
+.stagger-6 { animation-delay: 0.48s; }
 
 /* ============================================
    Custom Components
    ============================================ */
 
-/* Soft input styling */
+/* Soft flowing input */
 .soft-input {
-  @apply bg-input border-2 border-transparent rounded-2xl px-4 py-3 transition-all duration-300;
+  @apply bg-input border-2 border-transparent px-5 py-3 transition-all duration-300;
+  border-radius: 24px;
 }
 
 .soft-input:focus {
-  @apply border-primary outline-none bg-white;
-  box-shadow: 0 0 0 4px hsl(200 85% 55% / 0.15);
+  @apply border-primary outline-none;
+  background: hsl(0 0% 100%);
+  box-shadow: 
+    0 0 0 5px hsl(195 85% 55% / 0.12),
+    0 4px 20px hsl(195 85% 55% / 0.15);
 }
 
 .soft-input::placeholder {
   @apply text-muted-foreground;
 }
 
-/* Soft button */
-.soft-btn {
-  @apply bg-primary text-primary-foreground px-6 py-3 rounded-2xl font-semibold transition-all duration-300;
+/* Water button with ripple */
+.water-btn {
+  @apply bg-primary text-primary-foreground px-7 py-3.5 font-semibold transition-all duration-300;
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
 }
 
-.soft-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px hsl(200 85% 55% / 0.4);
+.water-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.25), transparent);
+  transition: left 0.5s ease;
 }
 
-.soft-btn:active {
-  transform: translateY(0);
+.water-btn:hover::before {
+  left: 100%;
 }
 
-/* Glass card with soft blur */
-.glass-card {
-  @apply bg-card/90 backdrop-blur-sm rounded-3xl border border-border/50;
+.water-btn:hover {
+  transform: translateY(-3px);
   box-shadow: 
-    0 4px 20px -5px hsl(200 85% 55% / 0.1),
-    0 1px 3px hsl(210 25% 25% / 0.05);
-  transition: all 0.3s ease;
+    0 12px 35px -8px hsl(195 85% 45% / 0.45),
+    0 4px 15px hsl(195 85% 55% / 0.25);
+}
+
+.water-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Glass card with water effect */
+.glass-card {
+  @apply bg-card/85 backdrop-blur-md border border-border/40;
+  border-radius: 28px;
+  box-shadow: 
+    0 8px 32px -8px hsl(195 85% 55% / 0.12),
+    0 2px 8px hsl(195 30% 40% / 0.04),
+    inset 0 1px 0 hsl(0 0% 100% / 0.6);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .glass-card:hover {
   box-shadow: 
-    0 8px 30px -5px hsl(200 85% 55% / 0.15),
-    0 2px 6px hsl(210 25% 25% / 0.08);
-  transform: translateY(-2px);
+    0 16px 48px -12px hsl(195 85% 55% / 0.2),
+    0 4px 16px hsl(195 30% 40% / 0.08),
+    inset 0 1px 0 hsl(0 0% 100% / 0.8);
+  transform: translateY(-4px);
 }
 
-/* Floating card */
+/* Floating card with depth */
 .float-card {
-  @apply bg-card rounded-3xl border border-border/30;
+  @apply bg-card border border-border/30;
+  border-radius: 32px;
   box-shadow: 
-    0 10px 40px -10px hsl(200 85% 55% / 0.12),
-    0 4px 12px hsl(210 25% 25% / 0.04);
+    0 20px 60px -20px hsl(195 85% 55% / 0.18),
+    0 8px 24px hsl(195 30% 40% / 0.06),
+    inset 0 2px 0 hsl(0 0% 100% / 0.5);
 }
 
-/* Progress bar styling */
-.progress-soft {
-  @apply rounded-full overflow-hidden bg-muted;
+/* Water-like progress bar */
+.progress-water {
+  border-radius: 20px;
+  overflow: hidden;
+  background: hsl(195 25% 90%);
+  position: relative;
 }
 
-.progress-soft-bar {
-  @apply h-full rounded-full transition-all duration-500;
-  background: linear-gradient(90deg, hsl(200 85% 55%), hsl(185 70% 50%));
+.progress-water-bar {
+  @apply h-full transition-all duration-700;
+  border-radius: 20px;
+  background: linear-gradient(90deg, hsl(195 85% 50%), hsl(175 70% 45%), hsl(185 80% 50%));
+  background-size: 200% 100%;
+  animation: shimmer-flow 3s linear infinite;
+  position: relative;
+}
+
+.progress-water-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, hsl(0 0% 100% / 0.3), transparent);
+  border-radius: 20px 20px 0 0;
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(210 20% 96%);
+  background: hsl(195 20% 94%);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(200 30% 80%);
+  background: linear-gradient(180deg, hsl(195 50% 75%), hsl(185 45% 70%));
   border-radius: 10px;
+  border: 2px solid hsl(195 20% 94%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(200 50% 70%);
+  background: linear-gradient(180deg, hsl(195 60% 65%), hsl(185 55% 60%));
 }
 
 /* Selection color */
 ::selection {
-  background: hsl(200 85% 55% / 0.2);
-  color: hsl(200 85% 35%);
+  background: hsl(195 85% 55% / 0.25);
+  color: hsl(195 85% 30%);
 }
 
 /* Category color utilities */
@@ -366,17 +548,53 @@
 .category-career { color: hsl(var(--category-career)); }
 .category-mental { color: hsl(var(--category-mental)); }
 
-.category-bg-physical { background-color: hsl(var(--category-physical) / 0.1); border-color: hsl(var(--category-physical) / 0.3); }
-.category-bg-social { background-color: hsl(var(--category-social) / 0.1); border-color: hsl(var(--category-social) / 0.3); }
-.category-bg-financial { background-color: hsl(var(--category-financial) / 0.1); border-color: hsl(var(--category-financial) / 0.3); }
-.category-bg-career { background-color: hsl(var(--category-career) / 0.1); border-color: hsl(var(--category-career) / 0.3); }
-.category-bg-mental { background-color: hsl(var(--category-mental) / 0.1); border-color: hsl(var(--category-mental) / 0.3); }
+.category-bg-physical { 
+  background: linear-gradient(135deg, hsl(var(--category-physical) / 0.12), hsl(var(--category-physical) / 0.05)); 
+  border-color: hsl(var(--category-physical) / 0.25); 
+}
+.category-bg-social { 
+  background: linear-gradient(135deg, hsl(var(--category-social) / 0.12), hsl(var(--category-social) / 0.05)); 
+  border-color: hsl(var(--category-social) / 0.25); 
+}
+.category-bg-financial { 
+  background: linear-gradient(135deg, hsl(var(--category-financial) / 0.12), hsl(var(--category-financial) / 0.05)); 
+  border-color: hsl(var(--category-financial) / 0.25); 
+}
+.category-bg-career { 
+  background: linear-gradient(135deg, hsl(var(--category-career) / 0.12), hsl(var(--category-career) / 0.05)); 
+  border-color: hsl(var(--category-career) / 0.25); 
+}
+.category-bg-mental { 
+  background: linear-gradient(135deg, hsl(var(--category-mental) / 0.12), hsl(var(--category-mental) / 0.05)); 
+  border-color: hsl(var(--category-mental) / 0.25); 
+}
 
-/* Blob shape utilities */
+/* Water blob utilities */
 .blob-shape {
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
 }
 
 .blob-shape-alt {
   border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%;
+}
+
+/* Flowing underline for links */
+.flow-underline {
+  position: relative;
+}
+
+.flow-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, hsl(195 85% 50%), hsl(175 70% 45%));
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.flow-underline:hover::after {
+  width: 100%;
 }
