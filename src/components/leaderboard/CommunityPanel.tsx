@@ -42,46 +42,46 @@ export default function CommunityPanel({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="heading-serif text-lg text-primary flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          COMMUNITIES
+        <h3 className="heading-display text-xl text-foreground flex items-center gap-2">
+          <Users className="w-5 h-5 text-primary" />
+          Communities
         </h3>
         
         <div className="flex gap-2">
           {/* Join Community Dialog */}
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-xs">
-                JOIN
+              <Button variant="outline" size="sm" className="rounded-full px-4 text-sm font-medium">
+                Join
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-card border-primary/30">
+            <DialogContent className="glass-card border-primary/20">
               <DialogHeader>
-                <DialogTitle className="heading-serif text-primary">JOIN_COMMUNITY</DialogTitle>
+                <DialogTitle className="heading-display text-xl text-foreground">Join a Community</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <div className="space-y-5 pt-4">
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-2">
-                    INVITE_CODE:
+                  <label className="text-sm text-muted-foreground block mb-2 font-medium">
+                    Invite Code
                   </label>
                   <Input
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value)}
                     placeholder="Enter invite code..."
-                    className="terminal-input"
+                    className="soft-input"
                   />
                 </div>
                 <Button 
-                  className="w-full matrix-btn"
+                  className="w-full water-btn"
                   onClick={() => {
                     onJoinCommunity(joinCode);
                     setJoinCode('');
                   }}
                   disabled={!joinCode}
                 >
-                  JOIN_COMMUNITY
+                  Join Community
                 </Button>
               </div>
             </DialogContent>
@@ -90,67 +90,67 @@ export default function CommunityPanel({
           {/* Create Community Dialog */}
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" className="text-xs">
+              <Button size="sm" className="rounded-full px-4 text-sm font-medium">
                 <Plus className="w-4 h-4 mr-1" />
-                CREATE
+                Create
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-card border-primary/30">
+            <DialogContent className="glass-card border-primary/20">
               <DialogHeader>
-                <DialogTitle className="heading-serif text-primary">CREATE_COMMUNITY</DialogTitle>
+                <DialogTitle className="heading-display text-xl text-foreground">Create Community</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <div className="space-y-5 pt-4">
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-2">
-                    COMMUNITY_NAME:
+                  <label className="text-sm text-muted-foreground block mb-2 font-medium">
+                    Community Name
                   </label>
                   <Input
                     value={newCommunityName}
                     onChange={(e) => setNewCommunityName(e.target.value)}
                     placeholder="Enter name..."
-                    className="terminal-input"
+                    className="soft-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-2">
-                    VISIBILITY:
+                  <label className="text-sm text-muted-foreground block mb-2 font-medium">
+                    Visibility
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={() => setIsPublic(true)}
                       className={cn(
-                        "flex-1 p-3 border transition-all",
+                        "flex-1 p-4 rounded-2xl border-2 transition-all duration-300",
                         isPublic 
-                          ? "border-primary bg-primary/10 text-primary" 
-                          : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                          ? "border-primary bg-primary/10 text-primary shadow-lg shadow-primary/20" 
+                          : "border-border text-muted-foreground hover:border-primary/50 hover:bg-secondary/50"
                       )}
                     >
-                      <Globe className="w-4 h-4 mx-auto mb-1" />
-                      <span className="text-xs">PUBLIC</span>
+                      <Globe className="w-5 h-5 mx-auto mb-2" />
+                      <span className="text-sm font-medium block">Public</span>
                     </button>
                     <button
                       onClick={() => setIsPublic(false)}
                       className={cn(
-                        "flex-1 p-3 border transition-all",
+                        "flex-1 p-4 rounded-2xl border-2 transition-all duration-300",
                         !isPublic 
-                          ? "border-primary bg-primary/10 text-primary" 
-                          : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                          ? "border-primary bg-primary/10 text-primary shadow-lg shadow-primary/20" 
+                          : "border-border text-muted-foreground hover:border-primary/50 hover:bg-secondary/50"
                       )}
                     >
-                      <Lock className="w-4 h-4 mx-auto mb-1" />
-                      <span className="text-xs">PRIVATE</span>
+                      <Lock className="w-5 h-5 mx-auto mb-2" />
+                      <span className="text-sm font-medium block">Private</span>
                     </button>
                   </div>
                 </div>
                 <Button 
-                  className="w-full matrix-btn"
+                  className="w-full water-btn"
                   onClick={() => {
                     onCreateCommunity(newCommunityName, isPublic);
                     setNewCommunityName('');
                   }}
                   disabled={!newCommunityName}
                 >
-                  CREATE_COMMUNITY
+                  Create Community
                 </Button>
               </div>
             </DialogContent>
@@ -159,17 +159,20 @@ export default function CommunityPanel({
       </div>
 
       {/* Community List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {communities.map((community, index) => (
           <div 
             key={community.id}
             className={cn(
-              "glass-card p-4 flex items-center justify-between animate-fade-in-up",
+              "glass-card p-5 flex items-center justify-between animate-fade-in-up ripple-effect",
               `stagger-${index + 1}`
             )}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 border border-primary/50 flex items-center justify-center">
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center",
+                "bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30"
+              )}>
                 {community.isPublic ? (
                   <Globe className="w-5 h-5 text-primary" />
                 ) : (
@@ -177,14 +180,16 @@ export default function CommunityPanel({
                 )}
               </div>
               <div>
-                <span className="font-mono text-card-foreground">{community.name}</span>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Users className="w-3 h-3" />
-                  {community.memberCount} members
+                <span className="font-semibold text-card-foreground heading-display">{community.name}</span>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5" />
+                    {community.memberCount} members
+                  </span>
                   {community.yourRank && (
                     <>
-                      <span>•</span>
-                      <span>Rank #{community.yourRank}</span>
+                      <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+                      <span className="text-primary font-medium">Rank #{community.yourRank}</span>
                     </>
                   )}
                 </div>
@@ -193,26 +198,31 @@ export default function CommunityPanel({
 
             <button
               onClick={() => handleCopyCode(community.id)}
-              className="p-2 hover:bg-primary/10 transition-colors"
+              className={cn(
+                "p-3 rounded-full transition-all duration-300",
+                "hover:bg-primary/10 hover:scale-110"
+              )}
               title="Copy invite code"
             >
               {copiedId === community.id ? (
-                <Check className="w-4 h-4 text-primary" />
+                <Check className="w-5 h-5 text-accent" />
               ) : (
-                <Copy className="w-4 h-4 text-muted-foreground" />
+                <Copy className="w-5 h-5 text-muted-foreground" />
               )}
             </button>
           </div>
         ))}
 
         {communities.length === 0 && (
-          <div className="glass-card p-8 text-center">
-            <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-muted-foreground font-mono text-sm">
-              // NO_COMMUNITIES_JOINED
+          <div className="glass-card p-10 text-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-4 animate-float">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <p className="text-foreground font-semibold heading-display text-lg">
+              No communities yet
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Join or create a community to compete with others.
+            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+              Join or create a community to compete with friends and stay motivated together.
             </p>
           </div>
         )}
