@@ -172,7 +172,7 @@ export default function Leaderboard() {
 
     if (error || !community) {
       toast({
-        title: 'ERROR',
+        title: 'Error',
         description: 'Invalid invite code',
         variant: 'destructive'
       });
@@ -188,7 +188,7 @@ export default function Leaderboard() {
 
     if (joinError) {
       toast({
-        title: 'ERROR',
+        title: 'Error',
         description: 'Failed to join community',
         variant: 'destructive'
       });
@@ -196,7 +196,7 @@ export default function Leaderboard() {
     }
 
     toast({
-      title: 'JOINED',
+      title: 'Welcome! 🎉',
       description: `You've joined ${community.name}!`
     });
 
@@ -220,7 +220,7 @@ export default function Leaderboard() {
 
     if (error) {
       toast({
-        title: 'ERROR',
+        title: 'Error',
         description: 'Failed to create community',
         variant: 'destructive'
       });
@@ -236,7 +236,7 @@ export default function Leaderboard() {
       });
 
     toast({
-      title: 'CREATED',
+      title: 'Created! 🎊',
       description: `${name} has been created!`
     });
 
@@ -249,14 +249,14 @@ export default function Leaderboard() {
     <AppLayout>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in-up">
           <div>
-            <h1 className="heading-serif text-3xl text-primary matrix-glow mb-2 flex items-center gap-3">
+            <h1 className="heading-display text-3xl text-primary mb-2 flex items-center gap-3">
               <Trophy className="w-8 h-8" />
-              LEADERBOARD
+              Leaderboard
             </h1>
-            <p className="text-muted-foreground text-sm font-mono">
-              // Compete with the community, climb the ranks
+            <p className="text-muted-foreground text-sm">
+              Compete with the community and climb the ranks
             </p>
           </div>
 
@@ -265,26 +265,26 @@ export default function Leaderboard() {
             <button
               onClick={() => setView('global')}
               className={cn(
-                "px-4 py-2 border flex items-center gap-2 transition-all",
+                "px-4 py-2 rounded-full border flex items-center gap-2 transition-all",
                 view === 'global'
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                  : "border-border text-muted-foreground hover:border-primary/50"
               )}
             >
               <Globe className="w-4 h-4" />
-              <span className="text-xs font-mono">GLOBAL</span>
+              <span className="text-xs">Global</span>
             </button>
             <button
               onClick={() => setView('community')}
               className={cn(
-                "px-4 py-2 border flex items-center gap-2 transition-all",
+                "px-4 py-2 rounded-full border flex items-center gap-2 transition-all",
                 view === 'community'
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                  : "border-border text-muted-foreground hover:border-primary/50"
               )}
             >
               <Users className="w-4 h-4" />
-              <span className="text-xs font-mono">COMMUNITIES</span>
+              <span className="text-xs">Communities</span>
             </button>
           </div>
         </div>
@@ -296,19 +296,19 @@ export default function Leaderboard() {
               {/* Filter */}
               <div className="flex items-center gap-2 mb-4 animate-fade-in-up stagger-1">
                 <Filter className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-mono">FILTER:</span>
+                <span className="text-xs text-muted-foreground">Filter:</span>
                 {(['all', 'weekly', 'monthly'] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
                     className={cn(
-                      "px-3 py-1 text-xs font-mono border transition-all",
+                      "px-3 py-1 text-xs rounded-full border transition-all",
                       filter === f
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                        : "border-border text-muted-foreground hover:border-primary/50"
                     )}
                   >
-                    {f.toUpperCase()}
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
                   </button>
                 ))}
               </div>
@@ -316,7 +316,7 @@ export default function Leaderboard() {
               {loading ? (
                 <div className="space-y-4">
                   {[1, 2, 3, 4, 5].map(i => (
-                    <Skeleton key={i} className="h-20 bg-muted" />
+                    <Skeleton key={i} className="h-20 bg-muted rounded-3xl" />
                   ))}
                 </div>
               ) : (
@@ -327,21 +327,21 @@ export default function Leaderboard() {
                       <div 
                         key={entry.userId}
                         className={cn(
-                          "glass-card p-6 text-center",
-                          index === 0 && "border-yellow-400/50 bg-gradient-to-b from-yellow-400/10 to-transparent order-2 lg:-mt-4",
-                          index === 1 && "border-gray-400/50 bg-gradient-to-b from-gray-400/10 to-transparent order-1",
-                          index === 2 && "border-orange-400/50 bg-gradient-to-b from-orange-400/10 to-transparent order-3"
+                          "glass-card p-6 rounded-3xl text-center",
+                          index === 0 && "bg-gradient-to-b from-yellow-400/10 to-transparent border-yellow-400/30 order-2 lg:-mt-4",
+                          index === 1 && "bg-gradient-to-b from-gray-300/10 to-transparent border-gray-400/30 order-1",
+                          index === 2 && "bg-gradient-to-b from-orange-400/10 to-transparent border-orange-400/30 order-3"
                         )}
                       >
                         <div className="text-4xl mb-2">
                           {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                         </div>
-                        <div className="font-mono text-card-foreground mb-1">
+                        <div className="font-display text-foreground mb-1">
                           {entry.username}
                         </div>
                         <div className={cn(
-                          "text-2xl font-mono font-bold matrix-glow",
-                          index === 0 ? "text-yellow-400" : index === 1 ? "text-gray-300" : "text-orange-400"
+                          "text-2xl font-display font-bold",
+                          index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-400" : "text-orange-400"
                         )}>
                           {entry.score.toFixed(1)}
                         </div>
@@ -370,12 +370,12 @@ export default function Leaderboard() {
                   </div>
 
                   {leaderboard.length === 0 && (
-                    <div className="glass-card p-12 text-center">
+                    <div className="glass-card p-12 rounded-3xl text-center">
                       <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground font-mono">
-                        // LEADERBOARD_EMPTY
+                      <p className="text-foreground font-display text-lg mb-2">
+                        No rankings yet
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-muted-foreground">
                         Complete goals to appear on the leaderboard.
                       </p>
                     </div>
@@ -387,17 +387,17 @@ export default function Leaderboard() {
             {/* Your Rank Sidebar */}
             <div className="space-y-6 animate-fade-in-up stagger-3">
               {currentUserEntry && (
-                <div className="glass-card p-6 border-primary/50">
-                  <h3 className="heading-serif text-sm text-muted-foreground mb-4">YOUR_POSITION</h3>
+                <div className="glass-card p-6 rounded-3xl border-primary/30">
+                  <h3 className="text-sm text-muted-foreground mb-4">Your Position</h3>
                   <div className="text-center">
-                    <div className="text-5xl font-mono font-bold text-primary matrix-glow mb-2">
+                    <div className="text-5xl font-display font-bold text-primary mb-2">
                       #{currentUserEntry.rank}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       out of {leaderboard.length} users
                     </div>
-                    <div className="mt-4 pt-4 border-t border-primary/20">
-                      <div className="text-2xl font-mono font-bold text-card-foreground">
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="text-2xl font-display font-bold text-foreground">
                         {currentUserEntry.score.toFixed(1)}
                       </div>
                       <div className="text-xs text-muted-foreground">points</div>
@@ -406,16 +406,16 @@ export default function Leaderboard() {
                 </div>
               )}
 
-              <div className="glass-card p-6">
-                <h3 className="heading-serif text-sm text-muted-foreground mb-4">QUICK_STATS</h3>
+              <div className="glass-card p-6 rounded-3xl">
+                <h3 className="text-sm text-muted-foreground mb-4">Quick Stats</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-xs text-muted-foreground">Total Players</span>
-                    <span className="font-mono text-card-foreground">{leaderboard.length}</span>
+                    <span className="text-foreground">{leaderboard.length}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-muted-foreground">Avg Score</span>
-                    <span className="font-mono text-card-foreground">
+                    <span className="text-foreground">
                       {leaderboard.length > 0 
                         ? (leaderboard.reduce((a, b) => a + b.score, 0) / leaderboard.length).toFixed(1)
                         : '0.0'
@@ -424,7 +424,7 @@ export default function Leaderboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-xs text-muted-foreground">Top Score</span>
-                    <span className="font-mono text-primary">
+                    <span className="text-primary font-medium">
                       {leaderboard.length > 0 ? leaderboard[0].score.toFixed(1) : '0.0'}
                     </span>
                   </div>

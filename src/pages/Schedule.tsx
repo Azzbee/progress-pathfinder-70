@@ -32,14 +32,14 @@ export default function Schedule() {
 
   const getCategoryColor = (category: string): string => {
     const colors: Record<string, string> = {
-      'Physical': 'hsl(120 100% 45%)',
-      'Social': 'hsl(200 100% 50%)',
+      'Physical': 'hsl(200 85% 55%)',
+      'Social': 'hsl(280 70% 60%)',
       'Financial': 'hsl(45 100% 50%)',
-      'Career': 'hsl(280 100% 60%)',
-      'Mental': 'hsl(320 100% 50%)',
-      'Daily': 'hsl(120 100% 45%)',
+      'Career': 'hsl(160 70% 45%)',
+      'Mental': 'hsl(320 70% 60%)',
+      'Daily': 'hsl(200 85% 55%)',
     };
-    return colors[category] || 'hsl(120 60% 40%)';
+    return colors[category] || 'hsl(200 85% 55%)';
   };
 
   const handleCreateEvent = async (eventData: {
@@ -68,7 +68,7 @@ export default function Schedule() {
 
     if (error) {
       toast({
-        title: 'ERROR',
+        title: 'Error',
         description: 'Failed to create event',
         variant: 'destructive'
       });
@@ -76,7 +76,7 @@ export default function Schedule() {
     }
 
     toast({
-      title: 'EVENT_CREATED',
+      title: 'Event Created! 🎉',
       description: `"${eventData.title}" has been scheduled.`
     });
 
@@ -87,17 +87,17 @@ export default function Schedule() {
     <AppLayout>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 animate-fade-in-up">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8 animate-fade-in-up">
           <div>
-            <h1 className="heading-serif text-3xl text-primary matrix-glow mb-2">
-              SCHEDULE_VIEW
+            <h1 className="heading-display text-3xl text-primary mb-2">
+              Schedule
             </h1>
-            <p className="text-muted-foreground text-sm font-mono">
-              // Weekly calendar and activity planning
+            <p className="text-muted-foreground text-sm">
+              Weekly calendar and activity planning
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <CreateEventDialog 
               categories={categories}
               selectedDate={selectedDay || undefined}
@@ -105,24 +105,24 @@ export default function Schedule() {
             />
             <button
               onClick={goToToday}
-              className="matrix-btn text-xs py-2 px-4"
+              className="btn-primary text-xs py-2 px-4 rounded-full flex items-center gap-2"
             >
-              <Calendar className="w-4 h-4 mr-2 inline" />
-              TODAY
+              <Calendar className="w-4 h-4" />
+              Today
             </button>
-            <div className="flex items-center gap-2 glass-card p-1">
+            <div className="flex items-center gap-2 glass-card p-1 rounded-full">
               <button
                 onClick={goToPrevWeek}
-                className="p-2 hover:bg-primary/10 transition-colors"
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-primary" />
               </button>
-              <span className="text-sm font-mono text-primary px-3">
+              <span className="text-sm text-foreground px-3">
                 {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
               </span>
               <button
                 onClick={goToNextWeek}
-                className="p-2 hover:bg-primary/10 transition-colors"
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-primary" />
               </button>
@@ -131,33 +131,33 @@ export default function Schedule() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="glass-card overflow-hidden animate-fade-in-up stagger-2">
+        <div className="glass-card rounded-3xl overflow-hidden animate-fade-in-up stagger-2">
           {/* Day Headers */}
-          <div className="grid grid-cols-8 border-b border-primary/20">
-            <div className="p-4 border-r border-primary/20">
-              <span className="text-xs text-muted-foreground font-mono">TIME_</span>
+          <div className="grid grid-cols-8 border-b border-border/50">
+            <div className="p-4 border-r border-border/50">
+              <span className="text-xs text-muted-foreground">Time</span>
             </div>
             {weekDays.map((day, index) => (
               <div
                 key={day.toISOString()}
                 className={cn(
-                  "p-4 text-center border-r border-primary/20 last:border-r-0 cursor-pointer transition-colors",
+                  "p-4 text-center border-r border-border/50 last:border-r-0 cursor-pointer transition-colors",
                   isToday(day) && "bg-primary/10",
                   selectedDay?.toDateString() === day.toDateString() && "bg-primary/20"
                 )}
                 onClick={() => setSelectedDay(day)}
               >
-                <div className="text-xs text-muted-foreground font-mono mb-1">
+                <div className="text-xs text-muted-foreground mb-1">
                   {format(day, 'EEE')}
                 </div>
                 <div className={cn(
-                  "text-lg font-mono",
-                  isToday(day) ? "text-primary matrix-glow" : "text-card-foreground"
+                  "text-lg font-display",
+                  isToday(day) ? "text-primary font-bold" : "text-foreground"
                 )}>
                   {format(day, 'd')}
                 </div>
                 {isToday(day) && (
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mx-auto mt-1 animate-pulse-glow" />
+                  <div className="w-2 h-2 bg-primary rounded-full mx-auto mt-1 animate-pulse" />
                 )}
               </div>
             ))}
@@ -166,10 +166,10 @@ export default function Schedule() {
           {/* Time Slots */}
           <div className="max-h-[600px] overflow-y-auto">
             {HOUR_SLOTS.map((hour) => (
-              <div key={hour} className="grid grid-cols-8 border-b border-primary/10 min-h-[60px]">
+              <div key={hour} className="grid grid-cols-8 border-b border-border/30 min-h-[60px]">
                 {/* Time Label */}
-                <div className="p-2 border-r border-primary/20 flex items-start justify-end">
-                  <span className="text-xs text-muted-foreground font-mono">
+                <div className="p-2 border-r border-border/50 flex items-start justify-end">
+                  <span className="text-xs text-muted-foreground">
                     {hour.toString().padStart(2, '0')}:00
                   </span>
                 </div>
@@ -186,12 +186,12 @@ export default function Schedule() {
                     <div
                       key={`${day.toISOString()}-${hour}`}
                       className={cn(
-                        "border-r border-primary/10 last:border-r-0 p-1 relative group",
+                        "border-r border-border/30 last:border-r-0 p-1 relative group",
                         isToday(day) && "bg-primary/5"
                       )}
                     >
                       {/* Add Event Button (hover) */}
-                      <button className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center bg-primary/5 transition-opacity">
+                      <button className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center bg-primary/5 transition-opacity rounded-lg">
                         <Plus className="w-4 h-4 text-primary/50" />
                       </button>
 
@@ -199,14 +199,14 @@ export default function Schedule() {
                       {hourEvents.map((event) => (
                         <div
                           key={event.id}
-                          className="relative z-10 p-2 text-xs border-l-2 bg-card/80 mb-1"
+                          className="relative z-10 p-2 text-xs border-l-2 bg-card rounded-lg shadow-soft mb-1"
                           style={{ borderColor: getCategoryColor(event.category) }}
                         >
                           <div className="flex items-center gap-1 mb-1">
                             {event.is_recurring && (
                               <Repeat className="w-3 h-3 text-muted-foreground" />
                             )}
-                            <span className="font-mono font-medium text-card-foreground truncate">
+                            <span className="font-medium text-foreground truncate">
                               {event.title}
                             </span>
                           </div>
@@ -225,44 +225,45 @@ export default function Schedule() {
         </div>
 
         {/* Legend */}
-        <div className="mt-6 flex items-center gap-6 text-xs font-mono animate-fade-in-up stagger-3">
-          <span className="text-muted-foreground">CATEGORIES:</span>
+        <div className="mt-6 flex flex-wrap items-center gap-4 text-xs animate-fade-in-up stagger-3">
+          <span className="text-muted-foreground">Categories:</span>
           {['Physical', 'Social', 'Financial', 'Career', 'Mental'].map((cat) => (
             <div key={cat} className="flex items-center gap-2">
               <div 
-                className="w-3 h-3 border"
+                className="w-3 h-3 rounded-full"
                 style={{ 
-                  backgroundColor: `${getCategoryColor(cat)}20`,
-                  borderColor: getCategoryColor(cat)
+                  backgroundColor: getCategoryColor(cat),
                 }}
               />
-              <span className="text-muted-foreground uppercase">{cat}</span>
+              <span className="text-muted-foreground">{cat}</span>
             </div>
           ))}
         </div>
 
         {/* Google Calendar Integration Notice */}
-        <div className="mt-8 glass-card p-6 animate-fade-in-up stagger-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <ExternalLink className="w-4 h-4 text-primary" />
-                <p className="text-muted-foreground font-mono text-sm">
-                  // GOOGLE_CALENDAR_SYNC
+        <div className="mt-8 glass-card p-6 rounded-3xl animate-fade-in-up stagger-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <ExternalLink className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-foreground font-display font-medium mb-1">
+                  Google Calendar Sync
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Connect your Google Calendar to sync external events automatically.
                 </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Connect your Google Calendar to sync external events automatically.
-              </p>
             </div>
             <button 
-              className="matrix-btn text-xs py-2 px-4"
+              className="btn-primary text-xs py-2 px-4 rounded-full"
               onClick={() => toast({
-                title: 'COMING_SOON',
+                title: 'Coming Soon! 🚀',
                 description: 'Google Calendar integration will be available soon.'
               })}
             >
-              CONNECT
+              Connect
             </button>
           </div>
         </div>

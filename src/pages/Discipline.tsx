@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import ScoreRing from '@/components/discipline/ScoreRing';
 import CategoryBreakdown from '@/components/discipline/CategoryBreakdown';
@@ -85,7 +85,7 @@ export default function Discipline() {
     if (streak.current_streak >= 7) {
       insights.push({
         type: 'success' as const,
-        title: 'Streak Champion!',
+        title: 'Streak Champion! 🔥',
         description: `You've maintained a ${streak.current_streak}-day streak. Your consistency is paying off.`,
       });
     }
@@ -94,7 +94,7 @@ export default function Discipline() {
     if (bestCat.score >= 7) {
       insights.push({
         type: 'success' as const,
-        title: `Excelling in ${bestCat.name}`,
+        title: `Excelling in ${bestCat.name} ⭐`,
         description: `Your ${bestCat.name} score of ${bestCat.score.toFixed(1)} is exceptional. Keep it up!`,
       });
     }
@@ -152,27 +152,27 @@ export default function Discipline() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in-up">
-          <h1 className="heading-serif text-3xl text-primary matrix-glow mb-2">
-            DISCIPLINE_ANALYSIS
+          <h1 className="heading-display text-3xl text-primary mb-2">
+            Discipline Analysis
           </h1>
-          <p className="text-muted-foreground text-sm font-mono">
-            // Deep dive into your performance metrics and optimization paths
+          <p className="text-muted-foreground text-sm">
+            Deep dive into your performance metrics and find ways to improve
           </p>
         </div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Skeleton className="h-96 bg-muted col-span-1" />
-            <Skeleton className="h-96 bg-muted col-span-2" />
+            <Skeleton className="h-96 bg-muted rounded-3xl col-span-1" />
+            <Skeleton className="h-96 bg-muted rounded-3xl col-span-2" />
           </div>
         ) : (
           <>
             {/* Main Score Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Overall Score */}
-              <div className="glass-card p-8 flex flex-col items-center justify-center animate-fade-in-up">
-                <h2 className="heading-serif text-sm text-muted-foreground mb-6">
-                  OVERALL_DISCIPLINE_SCORE
+              <div className="glass-card p-8 rounded-3xl flex flex-col items-center justify-center animate-fade-in-up">
+                <h2 className="text-sm text-muted-foreground mb-6">
+                  Overall Discipline Score
                 </h2>
                 <ScoreRing 
                   score={overallScore} 
@@ -186,13 +186,13 @@ export default function Discipline() {
                         key={range}
                         onClick={() => handleTimeRangeChange(range)}
                         className={cn(
-                          "px-4 py-2 text-xs font-mono border transition-all",
+                          "px-4 py-2 text-xs rounded-full border transition-all",
                           selectedTimeRange === range
                             ? "border-primary bg-primary/10 text-primary"
-                            : "border-primary/30 text-muted-foreground hover:border-primary/50"
+                            : "border-border text-muted-foreground hover:border-primary/50"
                         )}
                       >
-                        {range.toUpperCase()}
+                        {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : '90 Days'}
                       </button>
                     ))}
                   </div>
