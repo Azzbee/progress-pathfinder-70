@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,14 +21,20 @@ export default function Auth() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
   const { signIn, signUp, user } = useAuth();
+  const { isCompleted, loading: onboardingLoading } = useOnboarding();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (user && !onboardingLoading) {
+      // Redirect to onboarding if not completed, otherwise to dashboard
+      if (isCompleted === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [user, navigate]);
+  }, [user, isCompleted, onboardingLoading, navigate]);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
