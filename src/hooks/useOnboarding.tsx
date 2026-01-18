@@ -44,7 +44,7 @@ export function useOnboarding() {
       .from('onboarding_responses')
       .select('is_completed')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error checking onboarding:', error);
@@ -64,7 +64,7 @@ export function useOnboarding() {
       .from('onboarding_responses')
       .select('id')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       await supabase
@@ -86,7 +86,7 @@ export function useOnboarding() {
       .from('onboarding_responses')
       .select('id')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       await supabase

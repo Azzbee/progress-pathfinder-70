@@ -1,7 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { ArrowRight, ArrowLeft, Target, Check, Sparkles } from 'lucide-react';
+import { 
+  ArrowRight, 
+  ArrowLeft, 
+  Target, 
+  Sparkles, 
+  Calendar, 
+  TrendingUp, 
+  Award, 
+  Trophy, 
+  MessageCircle,
+  Check,
+  Crown,
+  Zap
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -74,14 +87,70 @@ const categoryLabels: Record<string, string> = {
   goal_setting: 'Goal Setting'
 };
 
+const tutorialSteps = [
+  {
+    icon: Target,
+    title: 'Goals',
+    description: 'Set and track your goals across different life categories. Break them into actionable tasks and watch your progress grow.'
+  },
+  {
+    icon: Calendar,
+    title: 'Schedule',
+    description: 'Plan your day with events and tasks. See your daily schedule at a glance and never miss an important commitment.'
+  },
+  {
+    icon: TrendingUp,
+    title: 'Progress',
+    description: 'Visualize your journey with charts and metrics. Track how you are improving over time across all areas.'
+  },
+  {
+    icon: Award,
+    title: 'Discipline',
+    description: 'Get a score that reflects your consistency. See what you are excelling at and where you need focus.'
+  },
+  {
+    icon: Trophy,
+    title: 'Leaderboard',
+    description: 'Compete with others globally or create communities with friends to stay motivated together.'
+  },
+  {
+    icon: MessageCircle,
+    title: 'AI Coach',
+    description: 'Get personalized guidance and advice from your AI coach to help you set better goals and stay on track.'
+  }
+];
+
+const freeFeatures = [
+  'Goal Setting',
+  'Scheduling',
+  'Goal Tracking',
+  'Leaderboard',
+  'Communities'
+];
+
+const proFeatures = [
+  'Goal Setting',
+  'Scheduling',
+  'Goal Tracking',
+  'Leaderboard',
+  'Communities',
+  'Progress Analytics',
+  'Discipline Insights',
+  'AI Coaching Assistant'
+];
+
+type OnboardingStep = 'welcome' | 'survey' | 'complete' | 'tutorial' | 'motivation' | 'paywall';
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { saveResponses, completeOnboarding, skipOnboarding } = useOnboarding();
   
-  const [step, setStep] = useState<'welcome' | 'survey' | 'complete' | 'motivation' | 'tutorial'>('welcome');
+  const [step, setStep] = useState<OnboardingStep>('welcome');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [motivationStep, setMotivationStep] = useState(0);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | null>(null);
 
   const handleAnswer = (questionId: string, value: any) => {
     const newAnswers = { ...answers, [questionId]: value };
@@ -113,8 +182,23 @@ export default function Onboarding() {
     navigate('/dashboard');
   };
 
+  const nextTutorialStep = () => {
+    if (tutorialStep < tutorialSteps.length - 1) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
+      setStep('motivation');
+    }
+  };
+
+  const prevTutorialStep = () => {
+    if (tutorialStep > 0) {
+      setTutorialStep(tutorialStep - 1);
+    }
+  };
+
   const currentQ = surveyQuestions[currentQuestion];
   const hasAnswer = answers[currentQ?.id] !== undefined;
+  const currentTutorial = tutorialSteps[tutorialStep];
 
   return (
     <div className="min-h-screen water-bg flex items-center justify-center p-4">
@@ -247,10 +331,60 @@ export default function Onboarding() {
               Now that you know what you want to achieve, let's show you how to get there.
             </p>
 
-            <Button onClick={() => setStep('motivation')} className="w-full">
-              Continue
+            <Button onClick={() => setStep('tutorial')} className="w-full">
+              Show Me How
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
+          </div>
+        )}
+
+        {/* Tutorial Step */}
+        {step === 'tutorial' && currentTutorial && (
+          <div className="glass-card rounded-3xl p-8 animate-fade-in-up">
+            {/* Progress dots */}
+            <div className="flex justify-center gap-2 mb-8">
+              {tutorialSteps.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    'w-2 h-2 rounded-full transition-all',
+                    idx === tutorialStep 
+                      ? 'w-6 bg-primary' 
+                      : idx < tutorialStep 
+                        ? 'bg-primary/50' 
+                        : 'bg-muted/50'
+                  )}
+                />
+              ))}
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <currentTutorial.icon className="w-8 h-8 text-primary" />
+              </div>
+              
+              <h2 className="heading-display text-xl text-foreground mb-3">
+                {currentTutorial.title}
+              </h2>
+              
+              <p className="text-muted-foreground mb-8">
+                {currentTutorial.description}
+              </p>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex gap-3">
+              {tutorialStep > 0 && (
+                <Button variant="outline" onClick={prevTutorialStep}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              )}
+              <Button onClick={nextTutorialStep} className="flex-1">
+                {tutorialStep === tutorialSteps.length - 1 ? 'Continue' : 'Next'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
           </div>
         )}
 
@@ -280,12 +414,111 @@ export default function Onboarding() {
                 <p className="text-muted-foreground mb-8">
                   than those who don't
                 </p>
-                <Button onClick={handleComplete} className="w-full">
-                  Start Your Journey
+                <Button onClick={() => setStep('paywall')} className="w-full">
+                  Choose Your Plan
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </>
             )}
+          </div>
+        )}
+
+        {/* Paywall Step */}
+        {step === 'paywall' && (
+          <div className="animate-fade-in-up">
+            <h2 className="heading-display text-2xl text-foreground text-center mb-6">
+              Choose Your Plan
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Free Trial */}
+              <button
+                onClick={() => setSelectedPlan('free')}
+                className={cn(
+                  'glass-card rounded-3xl p-6 text-left transition-all border-2',
+                  selectedPlan === 'free' 
+                    ? 'border-primary ring-2 ring-primary/20' 
+                    : 'border-transparent hover:border-border'
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-5 h-5 text-muted-foreground" />
+                  <h3 className="font-display font-semibold text-foreground">Free Trial</h3>
+                </div>
+                <p className="text-2xl font-bold text-foreground mb-1">3 Days</p>
+                <p className="text-xs text-muted-foreground mb-4">No credit card required</p>
+                
+                <div className="space-y-2">
+                  {freeFeatures.map((feature) => (
+                    <div key={feature} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-primary" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 text-sm opacity-50">
+                    <div className="w-4 h-4 border border-muted-foreground/50 rounded" />
+                    <span className="text-muted-foreground line-through">Progress Analytics</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm opacity-50">
+                    <div className="w-4 h-4 border border-muted-foreground/50 rounded" />
+                    <span className="text-muted-foreground line-through">Discipline Insights</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm opacity-50">
+                    <div className="w-4 h-4 border border-muted-foreground/50 rounded" />
+                    <span className="text-muted-foreground line-through">AI Coaching Assistant</span>
+                  </div>
+                </div>
+              </button>
+
+              {/* Pro Version */}
+              <button
+                onClick={() => setSelectedPlan('pro')}
+                className={cn(
+                  'glass-card rounded-3xl p-6 text-left transition-all border-2 relative overflow-hidden',
+                  selectedPlan === 'pro' 
+                    ? 'border-primary ring-2 ring-primary/20' 
+                    : 'border-transparent hover:border-border'
+                )}
+              >
+                <div className="absolute top-3 right-3">
+                  <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+                    Popular
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="w-5 h-5 text-primary" />
+                  <h3 className="font-display font-semibold text-foreground">Pro Version</h3>
+                </div>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <p className="text-2xl font-bold text-foreground">$2.99</p>
+                  <span className="text-sm text-muted-foreground">/month</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Full access to everything</p>
+                
+                <div className="space-y-2">
+                  {proFeatures.map((feature) => (
+                    <div key={feature} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-primary" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </button>
+            </div>
+
+            <Button 
+              onClick={handleComplete} 
+              disabled={!selectedPlan}
+              className="w-full"
+            >
+              {selectedPlan === 'pro' ? 'Start Pro Trial' : selectedPlan === 'free' ? 'Start Free Trial' : 'Select a Plan'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              Cancel anytime. No hidden fees.
+            </p>
           </div>
         )}
       </div>
