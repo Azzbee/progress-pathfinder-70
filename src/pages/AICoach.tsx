@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -292,7 +293,13 @@ export default function AICoach() {
                         ? 'bg-primary text-primary-foreground rounded-br-sm'
                         : 'bg-muted rounded-bl-sm'
                     )}>
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.role === 'user' ? (
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      ) : (
+                        <div className="text-sm prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-background/50 prose-pre:p-3">
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
