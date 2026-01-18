@@ -9,6 +9,7 @@ const navItems = [
   { icon: TrendingUp, path: '/progress', label: 'Progress', emoji: '📈' },
   { icon: Brain, path: '/discipline', label: 'Discipline', emoji: '🧠' },
   { icon: Trophy, path: '/leaderboard', label: 'Board', emoji: '🏆' },
+  { icon: Brain, path: '/ai-coach', label: 'Coach', emoji: '🤖' },
   { icon: Settings, path: '/settings', label: 'Settings', emoji: '⚙️' },
 ];
 
