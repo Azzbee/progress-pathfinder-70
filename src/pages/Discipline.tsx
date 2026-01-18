@@ -4,6 +4,7 @@ import ScoreRing from '@/components/discipline/ScoreRing';
 import CategoryBreakdown from '@/components/discipline/CategoryBreakdown';
 import PerformanceGraph from '@/components/discipline/PerformanceGraph';
 import InsightsPanel from '@/components/discipline/InsightsPanel';
+import StreakCounter from '@/components/dashboard/StreakCounter';
 import { useGoals } from '@/hooks/useGoals';
 import { useStreak } from '@/hooks/useStreak';
 import { useProgress } from '@/hooks/useProgress';
@@ -13,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 export default function Discipline() {
   const { goals, categories, loading: goalsLoading } = useGoals();
-  const { streak, loading: streakLoading } = useStreak();
+  const { streak, loading: streakLoading, useFreeze } = useStreak();
   const { dailyProgress, timeRange, setTimeRange, loading: progressLoading } = useProgress();
   const [selectedTimeRange, setSelectedTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
@@ -51,7 +52,7 @@ export default function Discipline() {
       return {
         name: cat.name,
         score: avgProgress / 10,
-        trend: Math.random() * 2 - 0.5, // Simulated trend for now
+        trend: Math.random() * 2 - 0.5,
         color: cat.color,
         goalsCompleted: completedGoals,
         totalGoals: categoryGoals.length
@@ -76,7 +77,7 @@ export default function Discipline() {
     });
   };
 
-  // Generate insights
+  // Generate insights - removed "Get Started" action
   const generateInsights = () => {
     const insights = [];
     const categoryData = calculateCategoryData();
@@ -85,27 +86,8 @@ export default function Discipline() {
     if (streak.current_streak >= 7) {
       insights.push({
         type: 'success' as const,
-        title: 'Streak Champion! 🔥',
+        title: 'Streak Champion',
         description: `You've maintained a ${streak.current_streak}-day streak. Your consistency is paying off.`,
-      });
-    }
-
-    const bestCat = categoryData.reduce((a, b) => a.score > b.score ? a : b, { score: 0, name: '' });
-    if (bestCat.score >= 7) {
-      insights.push({
-        type: 'success' as const,
-        title: `Excelling in ${bestCat.name} ⭐`,
-        description: `Your ${bestCat.name} score of ${bestCat.score.toFixed(1)} is exceptional. Keep it up!`,
-      });
-    }
-
-    const worstCat = categoryData.reduce((a, b) => a.score < b.score ? a : b, { score: 10, name: '' });
-    if (worstCat.score < 5 && worstCat.name) {
-      insights.push({
-        type: 'warning' as const,
-        title: `Focus on ${worstCat.name}`,
-        description: `Your ${worstCat.name} category needs attention. Consider adding more goals in this area.`,
-        action: 'Add goals'
       });
     }
 
@@ -120,9 +102,8 @@ export default function Discipline() {
     if (goals.length === 0) {
       insights.push({
         type: 'tip' as const,
-        title: 'Get Started',
-        description: 'Create your first goals to begin tracking your discipline score.',
-        action: 'Create goal'
+        title: 'Start Your Journey',
+        description: 'Head to the Goals section to create your first goals and begin tracking your discipline.',
       });
     }
 
@@ -141,11 +122,6 @@ export default function Discipline() {
   const worstCategory = categoryData.length > 0 
     ? categoryData.reduce((a, b) => a.score < b.score ? a : b)
     : undefined;
-
-  // Calculate consistency (days with any activity / total days)
-  const consistency = dailyProgress.length > 0 
-    ? Math.round((dailyProgress.filter(d => d.goalsCompleted > 0).length / dailyProgress.length) * 100)
-    : 0;
 
   return (
     <AppLayout>
@@ -167,10 +143,20 @@ export default function Discipline() {
           </div>
         ) : (
           <>
+            {/* Streak Counter (ADDED) */}
+            <div className="mb-8 animate-fade-in-up">
+              <StreakCounter
+                currentStreak={streak.current_streak}
+                longestStreak={streak.longest_streak}
+                freezesAvailable={streak.streak_freezes_available}
+                onUseFreeze={useFreeze}
+              />
+            </div>
+
             {/* Main Score Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Overall Score */}
-              <div className="glass-card p-8 rounded-3xl flex flex-col items-center justify-center animate-fade-in-up">
+              <div className="glass-card p-8 rounded-3xl flex flex-col items-center justify-center animate-fade-in-up stagger-2">
                 <h2 className="text-sm text-muted-foreground mb-6">
                   Overall Discipline Score
                 </h2>
@@ -199,25 +185,24 @@ export default function Discipline() {
                 </div>
               </div>
 
-              {/* Insights Panel */}
-              <div className="lg:col-span-2 animate-fade-in-up stagger-2">
+              {/* Insights Panel - removed consistency prop */}
+              <div className="lg:col-span-2 animate-fade-in-up stagger-3">
                 <InsightsPanel 
                   insights={insights}
                   bestCategory={bestCategory ? { name: bestCategory.name, score: bestCategory.score } : undefined}
                   worstCategory={worstCategory ? { name: worstCategory.name, score: worstCategory.score } : undefined}
                   streakDays={streak.current_streak}
-                  consistency={consistency}
                 />
               </div>
             </div>
 
             {/* Performance Graph */}
-            <div className="mb-8 animate-fade-in-up stagger-3">
+            <div className="mb-8 animate-fade-in-up stagger-4">
               <PerformanceGraph data={graphData} timeRange={selectedTimeRange} />
             </div>
 
             {/* Category Breakdown */}
-            <div className="animate-fade-in-up stagger-4">
+            <div className="animate-fade-in-up stagger-5">
               <CategoryBreakdown categories={categoryData} />
             </div>
           </>

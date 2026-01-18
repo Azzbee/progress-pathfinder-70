@@ -1,42 +1,40 @@
 import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import StreakCounter from '@/components/dashboard/StreakCounter';
-import DisciplineScore from '@/components/dashboard/DisciplineScore';
 import GoalCard from '@/components/dashboard/GoalCard';
 import CreateGoalDialog from '@/components/dashboard/CreateGoalDialog';
+import CategoryHealthBars from '@/components/dashboard/CategoryHealthBars';
 import { useGoals } from '@/hooks/useGoals';
-import { useStreak } from '@/hooks/useStreak';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Target, Sparkles } from 'lucide-react';
+import { Target, Sparkles, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { goals, categories, loading: goalsLoading, createGoal, toggleTask, deleteGoal } = useGoals();
-  const { streak, loading: streakLoading, useFreeze } = useStreak();
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  // Calculate discipline score based on goal completion
-  const calculateDisciplineScore = () => {
-    if (goals.length === 0) return 0;
-    const totalProgress = goals.reduce((sum, g) => sum + g.progress, 0);
-    return (totalProgress / goals.length / 10);
-  };
-
-  // Calculate category scores
-  const calculateCategoryScores = () => {
-    return categories.map(cat => {
-      const categoryGoals = goals.filter(g => g.category_id === cat.id);
-      if (categoryGoals.length === 0) return { name: cat.name, score: 0, color: cat.color };
+  // Calculate category completion percentages
+  const getCategoryData = () => {
+    const presetCategories = ['Physical', 'Mental', 'Academic', 'Financial', 'Social'];
+    
+    return presetCategories.map(catName => {
+      const category = categories.find(c => c.name === catName);
+      const categoryGoals = category 
+        ? goals.filter(g => g.category_id === category.id)
+        : [];
       
-      const avgProgress = categoryGoals.reduce((sum, g) => sum + g.progress, 0) / categoryGoals.length;
-      return {
-        name: cat.name,
-        score: avgProgress / 10,
-        color: cat.color
-      };
-    }).filter(c => c.score > 0);
-  };
+      const completedGoals = categoryGoals.filter(g => g.progress === 100).length;
+      const percentage = categoryGoals.length > 0 
+        ? Math.round((completedGoals / categoryGoals.length) * 100)
+        : 0;
 
-  const isLoading = goalsLoading || streakLoading;
+      return {
+        name: catName,
+        percentage,
+        totalGoals: categoryGoals.length,
+        completedGoals
+      };
+    });
+  };
 
   return (
     <AppLayout>
@@ -48,35 +46,10 @@ export default function Dashboard() {
               Goal Planner
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Track your objectives and build discipline
+              Track your objectives across all areas of life
             </p>
           </div>
           <CreateGoalDialog categories={categories} onCreateGoal={createGoal} />
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-48 bg-muted rounded-3xl" />
-              <Skeleton className="h-48 bg-muted rounded-3xl" />
-            </>
-          ) : (
-            <>
-              <StreakCounter
-                currentStreak={streak.current_streak}
-                longestStreak={streak.longest_streak}
-                freezesAvailable={streak.streak_freezes_available}
-                onUseFreeze={useFreeze}
-              />
-              <DisciplineScore
-                score={calculateDisciplineScore()}
-                categoryScores={calculateCategoryScores()}
-                timeframe={timeframe}
-                onTimeframeChange={setTimeframe}
-              />
-            </>
-          )}
         </div>
 
         {/* Goals List */}
@@ -86,7 +59,7 @@ export default function Dashboard() {
             Active Goals
           </h2>
           
-          {isLoading ? (
+          {goalsLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
                 <Skeleton key={i} className="h-24 bg-muted rounded-3xl" />
@@ -119,11 +92,28 @@ export default function Dashboard() {
                 Ready to start your journey?
               </p>
               <p className="text-muted-foreground text-sm">
-                Create your first goal to begin tracking your discipline.
+                Create your first goal to begin tracking your progress.
               </p>
             </div>
           )}
         </div>
+
+        {/* Category Health Bars */}
+        <CategoryHealthBars categories={getCategoryData()} />
+
+        {/* AI Coach Link */}
+        <button
+          onClick={() => navigate('/ai-coach')}
+          className="w-full glass-card p-4 rounded-2xl flex items-center gap-3 hover:border-primary/50 transition-all group"
+        >
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+            <MessageCircle className="w-5 h-5 text-primary" />
+          </div>
+          <div className="text-left">
+            <p className="text-foreground font-medium">Need help with goals?</p>
+            <p className="text-xs text-muted-foreground">Talk to AI Coach for personalized guidance</p>
+          </div>
+        </button>
       </div>
     </AppLayout>
   );

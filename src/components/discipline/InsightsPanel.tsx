@@ -1,11 +1,10 @@
-import { Lightbulb, AlertTriangle, Star, ArrowRight, Clock, Target } from 'lucide-react';
+import { Lightbulb, AlertTriangle, Star, Clock, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Insight {
   type: 'success' | 'warning' | 'tip';
   title: string;
   description: string;
-  action?: string;
 }
 
 interface InsightsPanelProps {
@@ -13,7 +12,6 @@ interface InsightsPanelProps {
   bestCategory?: { name: string; score: number };
   worstCategory?: { name: string; score: number };
   streakDays: number;
-  consistency: number;
 }
 
 export default function InsightsPanel({ 
@@ -21,7 +19,6 @@ export default function InsightsPanel({
   bestCategory, 
   worstCategory, 
   streakDays,
-  consistency 
 }: InsightsPanelProps) {
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -41,39 +38,29 @@ export default function InsightsPanel({
 
   return (
     <div className="space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-primary" />
-            <span className="text-xs text-muted-foreground font-mono">CURRENT_STREAK</span>
-          </div>
-          <div className="text-3xl font-mono font-bold text-primary matrix-glow">
-            {streakDays}
-            <span className="text-lg text-muted-foreground ml-1">days</span>
-          </div>
+      {/* Quick Stats - Only Streak */}
+      <div className="glass-card p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="w-4 h-4 text-primary" />
+          <span className="text-xs text-muted-foreground">Current Streak</span>
         </div>
-        
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-primary" />
-            <span className="text-xs text-muted-foreground font-mono">CONSISTENCY</span>
-          </div>
-          <div className="text-3xl font-mono font-bold text-card-foreground">
-            {consistency}
-            <span className="text-lg text-muted-foreground ml-1">%</span>
-          </div>
+        <div className="text-3xl font-display font-bold text-primary">
+          {streakDays}
+          <span className="text-lg text-muted-foreground ml-1">days</span>
         </div>
       </div>
 
-      {/* Best/Worst Categories */}
+      {/* Best/Worst Categories - Excelling In & Focus Needed */}
       {(bestCategory || worstCategory) && (
         <div className="grid grid-cols-2 gap-4">
           {bestCategory && (
             <div className="glass-card p-4 border-l-4 border-primary">
-              <span className="text-xs text-muted-foreground font-mono block mb-1">EXCELLING_IN</span>
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="text-xs text-muted-foreground">Excelling In</span>
+              </div>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-card-foreground">{bestCategory.name}</span>
+                <span className="text-foreground font-medium">{bestCategory.name}</span>
                 <span className="text-primary font-bold">{bestCategory.score.toFixed(1)}</span>
               </div>
             </div>
@@ -81,9 +68,12 @@ export default function InsightsPanel({
           
           {worstCategory && (
             <div className="glass-card p-4 border-l-4 border-orange-400">
-              <span className="text-xs text-muted-foreground font-mono block mb-1">FOCUS_NEEDED</span>
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingDown className="w-4 h-4 text-orange-400" />
+                <span className="text-xs text-muted-foreground">Focus Needed</span>
+              </div>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-card-foreground">{worstCategory.name}</span>
+                <span className="text-foreground font-medium">{worstCategory.name}</span>
                 <span className="text-orange-400 font-bold">{worstCategory.score.toFixed(1)}</span>
               </div>
             </div>
@@ -91,9 +81,9 @@ export default function InsightsPanel({
         </div>
       )}
 
-      {/* AI Insights */}
+      {/* System Insights - No action buttons */}
       <div>
-        <h3 className="heading-serif text-lg text-primary mb-4">SYSTEM_INSIGHTS</h3>
+        <h3 className="heading-display text-lg text-primary mb-4">System Insights</h3>
         <div className="space-y-3">
           {insights.map((insight, index) => (
             <div 
@@ -109,18 +99,12 @@ export default function InsightsPanel({
                   {getInsightIcon(insight.type)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-mono text-sm text-card-foreground mb-1">
+                  <h4 className="font-medium text-sm text-foreground mb-1">
                     {insight.title}
                   </h4>
                   <p className="text-xs text-muted-foreground">
                     {insight.description}
                   </p>
-                  {insight.action && (
-                    <button className="flex items-center gap-1 text-xs text-primary mt-2 hover:underline">
-                      {insight.action}
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -129,8 +113,8 @@ export default function InsightsPanel({
           {insights.length === 0 && (
             <div className="glass-card p-6 text-center">
               <Lightbulb className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground font-mono text-sm">
-                // ANALYZING_PATTERNS...
+              <p className="text-muted-foreground text-sm">
+                Analyzing patterns...
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Complete more goals to unlock personalized insights.

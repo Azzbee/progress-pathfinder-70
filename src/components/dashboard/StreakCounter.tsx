@@ -67,9 +67,15 @@ export default function StreakCounter({
         </div>
 
         <div className="flex items-center gap-8">
-          {/* Current Streak */}
+          {/* Current Streak - Fire icon beside number */}
           <div className="flex-1 text-center">
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <div className={cn(
+                'text-6xl font-display font-bold',
+                isActiveStreak ? 'text-primary' : 'text-muted-foreground'
+              )}>
+                {displayStreak}
+              </div>
               <div className="relative">
                 <Flame className={cn('w-10 h-10', isActiveStreak ? 'text-primary' : 'text-muted-foreground')} />
                 {isActiveStreak && (
@@ -77,13 +83,7 @@ export default function StreakCounter({
                 )}
               </div>
             </div>
-            <div className={cn(
-              'text-6xl font-display font-bold',
-              isActiveStreak ? 'text-primary' : 'text-muted-foreground'
-            )}>
-              {displayStreak}
-            </div>
-            <div className="text-muted-foreground text-xs mt-2">Current Streak</div>
+            <div className="text-muted-foreground text-xs">Current Streak</div>
           </div>
 
           <div className="w-px h-24 bg-gradient-to-b from-transparent via-border to-transparent" />

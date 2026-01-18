@@ -118,66 +118,8 @@ export default function Progress() {
           </div>
         </div>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {[
-            { 
-              label: 'Average Score', 
-              value: avgScore, 
-              icon: Activity, 
-              trend: trend,
-            },
-            { 
-              label: 'Completion Rate', 
-              value: `${completionRate}%`, 
-              icon: Target, 
-            },
-            { 
-              label: 'Goals Completed', 
-              value: totalCompleted.toString(), 
-              icon: BarChart3, 
-            },
-            { 
-              label: 'Active Streak', 
-              value: streak.current_streak.toString(), 
-              icon: Flame, 
-            },
-          ].map((stat, index) => (
-            <div 
-              key={stat.label}
-              className="glass-card p-5 rounded-3xl animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-muted-foreground">{stat.label}</span>
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <stat.icon className="w-4 h-4 text-primary" />
-                </div>
-              </div>
-              <div className="flex items-end gap-2">
-                <span className="text-3xl font-display font-bold text-foreground">
-                  {stat.value}
-                </span>
-                {stat.trend !== undefined && (
-                  <span className={cn(
-                    "flex items-center gap-1 text-xs pb-1",
-                    stat.trend >= 0 ? "text-primary" : "text-destructive"
-                  )}>
-                    {stat.trend >= 0 ? (
-                      <TrendingUp className="w-3 h-3" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3" />
-                    )}
-                    {Math.abs(stat.trend).toFixed(1)}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Chart - Discipline Score */}
-        <div className="glass-card p-6 rounded-3xl mb-6 animate-fade-in-up stagger-2">
+        {/* Main Chart - Discipline Score (MOVED TO TOP) */}
+        <div className="glass-card p-6 rounded-3xl mb-6 animate-fade-in-up">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="heading-display text-lg text-foreground mb-1">Score Trend</h2>
@@ -190,38 +132,38 @@ export default function Progress() {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(200 85% 55%)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(200 85% 55%)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
-                  stroke="hsl(200 30% 85%)" 
+                  stroke="hsl(var(--border))" 
                   vertical={false}
                 />
                 <XAxis 
                   dataKey="date" 
-                  stroke="hsl(200 15% 55%)"
-                  tick={{ fill: 'hsl(200 15% 55%)', fontSize: 10, fontFamily: 'Nunito' }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: 'hsl(200 30% 85%)' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
                 <YAxis 
-                  stroke="hsl(200 15% 55%)"
-                  tick={{ fill: 'hsl(200 15% 55%)', fontSize: 10, fontFamily: 'Nunito' }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: 'hsl(200 30% 85%)' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
                   domain={[0, 10]}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="score"
-                  stroke="hsl(200 85% 55%)"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={3}
                   fill="url(#scoreGradient)"
-                  dot={{ fill: 'hsl(200 85% 55%)', strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6, fill: 'hsl(200 85% 60%)', stroke: 'white', strokeWidth: 2 }}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 0, r: 4 }}
+                  activeDot={{ r: 6, fill: 'hsl(var(--primary))', stroke: 'white', strokeWidth: 2 }}
                   name="Score"
                 />
               </AreaChart>
@@ -229,8 +171,8 @@ export default function Progress() {
           </div>
         </div>
 
-        {/* Category Breakdown */}
-        <div className="glass-card p-6 rounded-3xl animate-fade-in-up stagger-3">
+        {/* Category Breakdown (MOVED TO SECOND) */}
+        <div className="glass-card p-6 rounded-3xl mb-6 animate-fade-in-up stagger-2">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="heading-display text-lg text-foreground mb-1">Category Progress</h2>
@@ -277,28 +219,27 @@ export default function Progress() {
               <LineChart data={categoryChartData}>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
-                  stroke="hsl(200 30% 85%)" 
+                  stroke="hsl(var(--border))" 
                   vertical={false}
                 />
                 <XAxis 
                   dataKey="date" 
-                  stroke="hsl(200 15% 55%)"
-                  tick={{ fill: 'hsl(200 15% 55%)', fontSize: 10, fontFamily: 'Nunito' }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: 'hsl(200 30% 85%)' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
                 <YAxis 
-                  stroke="hsl(200 15% 55%)"
-                  tick={{ fill: 'hsl(200 15% 55%)', fontSize: 10, fontFamily: 'Nunito' }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: 'hsl(200 30% 85%)' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
                   domain={[0, 100]}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
                   wrapperStyle={{ 
                     paddingTop: '20px',
-                    fontFamily: 'Nunito',
                     fontSize: '12px',
                   }}
                 />
@@ -320,10 +261,67 @@ export default function Progress() {
           </div>
         </div>
 
+        {/* Summary Stats (MOVED TO BOTTOM) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fade-in-up stagger-3">
+          {[
+            { 
+              label: 'Average Score', 
+              value: avgScore, 
+              icon: Activity, 
+              trend: trend,
+            },
+            { 
+              label: 'Completion Rate', 
+              value: `${completionRate}%`, 
+              icon: Target, 
+            },
+            { 
+              label: 'Goals Completed', 
+              value: totalCompleted.toString(), 
+              icon: BarChart3, 
+            },
+            { 
+              label: 'Active Streak', 
+              value: streak.current_streak.toString(), 
+              icon: Flame, 
+            },
+          ].map((stat, index) => (
+            <div 
+              key={stat.label}
+              className="glass-card p-5 rounded-3xl"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-muted-foreground">{stat.label}</span>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <stat.icon className="w-4 h-4 text-primary" />
+                </div>
+              </div>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-display font-bold text-foreground">
+                  {stat.value}
+                </span>
+                {stat.trend !== undefined && (
+                  <span className={cn(
+                    "flex items-center gap-1 text-xs pb-1",
+                    stat.trend >= 0 ? "text-primary" : "text-destructive"
+                  )}>
+                    {stat.trend >= 0 ? (
+                      <TrendingUp className="w-3 h-3" />
+                    ) : (
+                      <TrendingDown className="w-3 h-3" />
+                    )}
+                    {Math.abs(stat.trend).toFixed(1)}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Data Notice */}
-        <div className="mt-6 text-center animate-fade-in-up stagger-4">
+        <div className="text-center animate-fade-in-up stagger-4">
           <p className="text-xs text-muted-foreground">
-            Data updates as you complete goals and tasks ✨
+            Data updates as you complete goals and tasks
           </p>
         </div>
       </div>
