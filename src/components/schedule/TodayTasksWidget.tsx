@@ -20,7 +20,7 @@ interface TodayTasksWidgetProps {
   onToggleTask: (taskId: string) => void;
 }
 
-export default function TodayTasksWidget({ tasks, onToggleTask }: TodayTasksWidgetProps) {
+export default function TodayTasksWidget({ tasks = [], onToggleTask }: TodayTasksWidgetProps) {
   const [splashTaskId, setSplashTaskId] = useState<string | null>(null);
   const { playDroplet, playSuccess } = useSoundEffects();
 
