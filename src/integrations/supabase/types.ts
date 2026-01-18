@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           created_at: string
@@ -100,6 +124,59 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          end_time: string
+          event_date: string
+          id: string
+          is_completed: boolean | null
+          recurrence_type: string | null
+          start_time: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time: string
+          event_date: string
+          id?: string
+          is_completed?: boolean | null
+          recurrence_type?: string | null
+          start_time: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: string
+          event_date?: string
+          id?: string
+          is_completed?: boolean | null
+          recurrence_type?: string | null
+          start_time?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "goal_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goal_categories: {
         Row: {
           color: string
@@ -173,6 +250,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      onboarding_responses: {
+        Row: {
+          academic_score: number | null
+          biggest_challenge: string | null
+          completed_at: string | null
+          doing_best: string | null
+          doing_worst: string | null
+          finances_score: number | null
+          fitness_score: number | null
+          happiness_score: number | null
+          id: string
+          is_completed: boolean | null
+          mental_wellbeing: number | null
+          social_score: number | null
+          user_id: string
+        }
+        Insert: {
+          academic_score?: number | null
+          biggest_challenge?: string | null
+          completed_at?: string | null
+          doing_best?: string | null
+          doing_worst?: string | null
+          finances_score?: number | null
+          fitness_score?: number | null
+          happiness_score?: number | null
+          id?: string
+          is_completed?: boolean | null
+          mental_wellbeing?: number | null
+          social_score?: number | null
+          user_id: string
+        }
+        Update: {
+          academic_score?: number | null
+          biggest_challenge?: string | null
+          completed_at?: string | null
+          doing_best?: string | null
+          doing_worst?: string | null
+          finances_score?: number | null
+          fitness_score?: number | null
+          happiness_score?: number | null
+          id?: string
+          is_completed?: boolean | null
+          mental_wellbeing?: number | null
+          social_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -274,6 +399,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_settings: {
+        Row: {
+          ambient_audio_enabled: boolean | null
+          ambient_audio_volume: number | null
+          animation_intensity: string | null
+          created_at: string | null
+          id: string
+          language: string | null
+          notifications_enabled: boolean | null
+          sound_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ambient_audio_enabled?: boolean | null
+          ambient_audio_volume?: number | null
+          animation_intensity?: string | null
+          created_at?: string | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          sound_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ambient_audio_enabled?: boolean | null
+          ambient_audio_volume?: number | null
+          animation_intensity?: string | null
+          created_at?: string | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          sound_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
