@@ -3,7 +3,9 @@ import AppLayout from '@/components/layout/AppLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useAmbientAudio } from '@/hooks/useAmbientAudio';
-import { useTheme } from '@/hooks/useTheme';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -18,9 +20,14 @@ import {
   Lock,
   LogOut,
   ChevronRight,
-  Palette,
   Eye,
-  EyeOff
+  EyeOff,
+  CreditCard,
+  Calendar,
+  ExternalLink,
+  Loader2,
+  Crown,
+  BellRing
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -37,17 +44,42 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 export default function Settings() {
   const { user, signOut } = useAuth();
   const { settings, updateSettings } = useUserSettings();
   const { isPlaying, volume, toggleAmbient, updateVolume } = useAmbientAudio();
-  const { theme, setTheme } = useTheme();
+  const { 
+    subscribed, 
+    planName, 
+    formattedEndDate, 
+    loading: subscriptionLoading, 
+    openCustomerPortal,
+    checkSubscription 
+  } = useSubscription();
+  const { 
+    isConnected: calendarConnected, 
+    isSyncing: calendarSyncing,
+    connect: connectCalendar,
+    disconnect: disconnectCalendar,
+    syncCurrentWeek,
+    isConfigured: calendarConfigured
+  } = useGoogleCalendar();
+  const {
+    isSupported: notificationsSupported,
+    isEnabled: notificationsEnabled,
+    permission: notificationPermission,
+    isLoading: notificationsLoading,
+    requestPermission,
+    disableNotifications
+  } = usePushNotifications();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
   
   // Password change state
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -137,6 +169,28 @@ export default function Settings() {
     setIsChangingPassword(false);
   };
 
+  const handleOpenCustomerPortal = async () => {
+    setIsOpeningPortal(true);
+    try {
+      await openCustomerPortal();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to open subscription management',
+        variant: 'destructive'
+      });
+    }
+    setIsOpeningPortal(false);
+  };
+
+  const handleTogglePushNotifications = async () => {
+    if (notificationsEnabled) {
+      disableNotifications();
+    } else {
+      await requestPermission();
+    }
+  };
+
   const animationOptions = [
     { value: 'off', label: 'Off' },
     { value: 'reduced', label: 'Reduced' },
@@ -165,8 +219,83 @@ export default function Settings() {
         </div>
 
         <div className="space-y-6">
-          {/* Account Section */}
+          {/* Subscription Section */}
           <div className="glass-card rounded-3xl p-6 animate-fade-in-up">
+            <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-primary" />
+              Subscription
+            </h2>
+
+            <div className="space-y-4">
+              {subscriptionLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/30">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center",
+                        subscribed ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                      )}>
+                        <Crown className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{planName}</span>
+                          {subscribed && (
+                            <Badge variant="default" className="text-xs">Active</Badge>
+                          )}
+                        </div>
+                        {formattedEndDate && (
+                          <p className="text-xs text-muted-foreground">
+                            Renews on {formattedEndDate}
+                          </p>
+                        )}
+                        {!subscribed && (
+                          <p className="text-xs text-muted-foreground">
+                            Upgrade for premium features
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {subscribed && (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                      onClick={handleOpenCustomerPortal}
+                      disabled={isOpeningPortal}
+                    >
+                      <span className="flex items-center gap-2">
+                        {isOpeningPortal ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ExternalLink className="w-4 h-4" />
+                        )}
+                        Manage Subscription
+                      </span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  )}
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => checkSubscription()}
+                    className="text-xs text-muted-foreground"
+                  >
+                    Refresh subscription status
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Account Section */}
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-1">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
               Account
@@ -288,53 +417,71 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Theme Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-1">
+          {/* Google Calendar Section */}
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-2">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
-              <Palette className="w-5 h-5 text-primary" />
-              Theme
+              <Calendar className="w-5 h-5 text-primary" />
+              Google Calendar
             </h2>
 
             <div className="space-y-4">
-              <div>
-                <Label className="text-foreground">App Theme</Label>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Choose between a soft water aesthetic or a hacker matrix style
+              <p className="text-sm text-muted-foreground">
+                Sync your Google Calendar events to your schedule
+              </p>
+
+              {calendarConnected ? (
+                <>
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-accent/10 border border-accent/20">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                      <span className="text-sm text-foreground">Connected to Google Calendar</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={syncCurrentWeek}
+                      disabled={calendarSyncing}
+                    >
+                      {calendarSyncing ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : null}
+                      Import This Week
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={disconnectCalendar}
+                    >
+                      Disconnect
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={connectCalendar}
+                >
+                  <span className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Connect Google Calendar
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
+
+              {!calendarConfigured && (
+                <p className="text-xs text-muted-foreground">
+                  Google Calendar integration requires configuration. Contact support for setup.
                 </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setTheme('softer')}
-                    className={cn(
-                      "p-4 rounded-2xl border-2 transition-all text-left",
-                      theme === 'softer' 
-                        ? "border-primary bg-primary/10" 
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(195,85%,45%)] to-[hsl(175,65%,45%)] mb-2" />
-                    <p className="font-medium text-foreground">Softer</p>
-                    <p className="text-xs text-muted-foreground">Water aesthetic</p>
-                  </button>
-                  <button
-                    onClick={() => setTheme('hacker')}
-                    className={cn(
-                      "p-4 rounded-2xl border-2 transition-all text-left",
-                      theme === 'hacker' 
-                        ? "border-primary bg-primary/10" 
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00ff41] to-[#003300] mb-2" />
-                    <p className="font-medium text-foreground">Hacker</p>
-                    <p className="text-xs text-muted-foreground">Matrix style</p>
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Language Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-2">
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-3">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <Globe className="w-5 h-5 text-primary" />
               Language
@@ -366,7 +513,7 @@ export default function Settings() {
           </div>
 
           {/* Audio Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-3">
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-4">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <Volume2 className="w-5 h-5 text-primary" />
               Audio
@@ -423,7 +570,7 @@ export default function Settings() {
           </div>
 
           {/* Animations Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-4">
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-5">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               Animations
@@ -457,28 +604,55 @@ export default function Settings() {
           </div>
 
           {/* Notifications Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-5">
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-6">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <Bell className="w-5 h-5 text-primary" />
               Notifications
             </h2>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-foreground">Push Notifications</Label>
-                <p className="text-xs text-muted-foreground">
-                  Get reminders for your goals
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-foreground">In-App Notifications</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Get reminders for your goals
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.notifications_enabled}
+                  onCheckedChange={(checked) => updateSettings({ notifications_enabled: checked })}
+                />
               </div>
-              <Switch
-                checked={settings.notifications_enabled}
-                onCheckedChange={(checked) => updateSettings({ notifications_enabled: checked })}
-              />
+
+              {notificationsSupported && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-foreground flex items-center gap-2">
+                      <BellRing className="w-4 h-4" />
+                      Push Notifications
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Get browser notifications for events and deadlines
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationsEnabled}
+                    onCheckedChange={handleTogglePushNotifications}
+                    disabled={notificationsLoading}
+                  />
+                </div>
+              )}
+
+              {notificationPermission === 'denied' && (
+                <p className="text-xs text-destructive">
+                  Push notifications are blocked. Please enable them in your browser settings.
+                </p>
+              )}
             </div>
           </div>
 
           {/* Support Section */}
-          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-6">
+          <div className="glass-card rounded-3xl p-6 animate-fade-in-up stagger-7">
             <h2 className="heading-display text-lg text-foreground mb-4 flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary" />
               Support
