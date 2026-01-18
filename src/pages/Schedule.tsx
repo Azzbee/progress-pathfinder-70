@@ -54,7 +54,15 @@ export default function Schedule() {
     category_id: string;
     recurrence_type: string;
   }) => {
-    await createEvent(eventData);
+    await createEvent({
+      title: eventData.title,
+      description: eventData.description,
+      event_date: eventData.date,
+      start_time: eventData.start_time,
+      end_time: eventData.end_time,
+      category_id: eventData.category_id,
+      recurrence_type: eventData.recurrence_type as 'one_time' | 'daily' | 'weekly'
+    });
     toast({
       title: 'Event Created',
       description: `"${eventData.title}" has been scheduled.`
@@ -69,8 +77,21 @@ export default function Schedule() {
     });
   };
 
-  // Get today's events for the widget
-  const todayEvents = events.filter(e => e.event_date === format(new Date(), 'yyyy-MM-dd'));
+  // Get today's events for the widget - transform to TodayTask format
+  const todayTasks = events
+    .filter(e => e.event_date === format(new Date(), 'yyyy-MM-dd'))
+    .map(e => {
+      const cat = categories.find(c => c.id === e.category_id);
+      return {
+        id: e.id,
+        title: e.title,
+        startTime: e.start_time,
+        endTime: e.end_time,
+        category: cat?.name || 'Other',
+        categoryColor: cat?.color || 'hsl(var(--primary))',
+        isCompleted: e.is_completed || false
+      };
+    });
 
   return (
     <AppLayout>
@@ -121,9 +142,8 @@ export default function Schedule() {
 
         {/* Today's Tasks Widget */}
         <TodayTasksWidget 
-          events={todayEvents}
-          onToggleComplete={toggleEventComplete}
-          onDelete={handleDeleteEvent}
+          tasks={todayTasks}
+          onToggleTask={toggleEventComplete}
         />
 
         {/* Calendar Grid */}

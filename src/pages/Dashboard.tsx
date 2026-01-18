@@ -14,22 +14,25 @@ export default function Dashboard() {
 
   // Calculate category completion percentages
   const getCategoryData = () => {
-    const presetCategories = ['Physical', 'Mental', 'Academic', 'Financial', 'Social'];
+    const presetCategories = [
+      { name: 'Physical', color: 'hsl(142 76% 36%)' },
+      { name: 'Mental', color: 'hsl(221 83% 53%)' },
+      { name: 'Academic', color: 'hsl(262 83% 58%)' },
+      { name: 'Financial', color: 'hsl(45 93% 47%)' },
+      { name: 'Social', color: 'hsl(0 84% 60%)' }
+    ];
     
-    return presetCategories.map(catName => {
-      const category = categories.find(c => c.name === catName);
+    return presetCategories.map(preset => {
+      const category = categories.find(c => c.name === preset.name);
       const categoryGoals = category 
         ? goals.filter(g => g.category_id === category.id)
         : [];
       
       const completedGoals = categoryGoals.filter(g => g.progress === 100).length;
-      const percentage = categoryGoals.length > 0 
-        ? Math.round((completedGoals / categoryGoals.length) * 100)
-        : 0;
 
       return {
-        name: catName,
-        percentage,
+        name: preset.name,
+        color: category?.color || preset.color,
         totalGoals: categoryGoals.length,
         completedGoals
       };
