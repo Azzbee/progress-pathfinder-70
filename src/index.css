@@ -598,3 +598,145 @@
 .flow-underline:hover::after {
   width: 100%;
 }
+
+/* ============================================
+   Splash & Droplet Animations
+   ============================================ */
+
+@keyframes splash-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes droplet-rise {
+  0% {
+    opacity: 1;
+    transform: translate(var(--x-offset, 0), -50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x-offset, 0), -50%) translateY(-60px) scale(0.3);
+  }
+}
+
+@keyframes splash-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Flowing Sidebar Gradients
+   ============================================ */
+
+@keyframes sidebar-flow {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+.sidebar-water {
+  background: 
+    linear-gradient(135deg, 
+      hsl(200 30% 98%) 0%, 
+      hsl(195 40% 95%) 25%,
+      hsl(185 35% 96%) 50%,
+      hsl(195 45% 93%) 75%,
+      hsl(200 30% 98%) 100%
+    );
+  background-size: 400% 400%;
+  animation: sidebar-flow 15s ease-in-out infinite;
+}
+
+@keyframes nav-glow-flow {
+  0%, 100% { 
+    box-shadow: 0 0 15px hsl(195 85% 55% / 0.2);
+    background-position: 0% 50%;
+  }
+  50% { 
+    box-shadow: 0 0 25px hsl(175 70% 50% / 0.3);
+    background-position: 100% 50%;
+  }
+}
+
+.nav-active-flow {
+  background: linear-gradient(90deg, 
+    hsl(195 85% 50%), 
+    hsl(175 70% 45%), 
+    hsl(185 80% 48%),
+    hsl(195 85% 50%)
+  ) !important;
+  background-size: 300% 100%;
+  animation: nav-glow-flow 4s ease-in-out infinite;
+}
+
+@keyframes nav-hover-wave {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.nav-hover-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-hover-wave::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    hsl(195 85% 55% / 0.08) 50%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-hover-wave:hover::before {
+  opacity: 1;
+  animation: nav-hover-wave 1.5s linear infinite;
+}
+
+/* Task completion animation */
+@keyframes task-complete-bounce {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.85); }
+  50% { transform: scale(1.15); }
+  75% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.task-complete-bounce {
+  animation: task-complete-bounce 0.4s ease-out;
+}
+
+/* Goal complete celebration */
+@keyframes goal-complete-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px hsl(175 70% 50% / 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 40px hsl(175 70% 50% / 0.5), 0 0 60px hsl(195 85% 55% / 0.3);
+  }
+}
+
+.goal-complete-glow {
+  animation: goal-complete-glow 1.5s ease-in-out 2;
+}
