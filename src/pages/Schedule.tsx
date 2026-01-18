@@ -1,45 +1,48 @@
 import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import CreateEventDialog from '@/components/schedule/CreateEventDialog';
-import { useSchedule } from '@/hooks/useSchedule';
+import TodayTasksWidget from '@/components/schedule/TodayTasksWidget';
+import { useEvents } from '@/hooks/useEvents';
 import { useGoals } from '@/hooks/useGoals';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { format, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat, ExternalLink } from 'lucide-react';
+import { format, isToday, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat, ExternalLink, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const HOUR_SLOTS = Array.from({ length: 16 }, (_, i) => i + 6); // 6 AM to 9 PM
+const HOUR_SLOTS = Array.from({ length: 24 }, (_, i) => i); // 12am to 11pm (24 hours)
 
 export default function Schedule() {
-  const { user } = useAuth();
   const { categories } = useGoals();
   const { toast } = useToast();
   const { 
-    weekDays, 
-    weekStart, 
-    weekEnd, 
+    events, 
     loading, 
-    goToNextWeek, 
-    goToPrevWeek, 
-    goToToday,
-    getEventsForDay,
-    refetch
-  } = useSchedule();
+    createEvent, 
+    deleteEvent, 
+    toggleEventComplete,
+    refetch 
+  } = useEvents();
 
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      'Physical': 'hsl(200 85% 55%)',
-      'Social': 'hsl(280 70% 60%)',
-      'Financial': 'hsl(45 100% 50%)',
-      'Career': 'hsl(160 70% 45%)',
-      'Mental': 'hsl(320 70% 60%)',
-      'Daily': 'hsl(200 85% 55%)',
-    };
-    return colors[category] || 'hsl(200 85% 55%)';
+  const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+  const goToNextWeek = () => setCurrentWeek(prev => addDays(prev, 7));
+  const goToPrevWeek = () => setCurrentWeek(prev => addDays(prev, -7));
+  const goToToday = () => setCurrentWeek(new Date());
+
+  const getCategoryColor = (categoryId: string | null): string => {
+    if (!categoryId) return 'hsl(var(--primary))';
+    const cat = categories.find(c => c.id === categoryId);
+    return cat?.color || 'hsl(var(--primary))';
+  };
+
+  const getEventsForDay = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return events.filter(e => e.event_date === dateStr);
   };
 
   const handleCreateEvent = async (eventData: {
@@ -49,45 +52,31 @@ export default function Schedule() {
     start_time: string;
     end_time: string;
     category_id: string;
-    is_recurring: boolean;
+    recurrence_type: string;
   }) => {
-    if (!user) return;
-
-    // Create as a goal with target_date (events are stored as goals)
-    const { error } = await supabase
-      .from('goals')
-      .insert({
-        user_id: user.id,
-        title: eventData.title,
-        description: eventData.description || null,
-        category_id: eventData.category_id,
-        target_date: eventData.date,
-        is_daily: eventData.is_recurring,
-        progress: 0
-      });
-
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to create event',
-        variant: 'destructive'
-      });
-      return;
-    }
-
+    await createEvent(eventData);
     toast({
-      title: 'Event Created! 🎉',
+      title: 'Event Created',
       description: `"${eventData.title}" has been scheduled.`
     });
-
-    refetch();
   };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    toast({
+      title: 'Event Deleted',
+      description: 'The event has been removed.'
+    });
+  };
+
+  // Get today's events for the widget
+  const todayEvents = events.filter(e => e.event_date === format(new Date(), 'yyyy-MM-dd'));
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8 animate-fade-in-up">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6 animate-fade-in-up">
           <div>
             <h1 className="heading-display text-3xl text-primary mb-2">
               Schedule
@@ -130,14 +119,21 @@ export default function Schedule() {
           </div>
         </div>
 
+        {/* Today's Tasks Widget */}
+        <TodayTasksWidget 
+          events={todayEvents}
+          onToggleComplete={toggleEventComplete}
+          onDelete={handleDeleteEvent}
+        />
+
         {/* Calendar Grid */}
-        <div className="glass-card rounded-3xl overflow-hidden animate-fade-in-up stagger-2">
+        <div className="glass-card rounded-3xl overflow-hidden animate-fade-in-up stagger-2 mt-6">
           {/* Day Headers */}
           <div className="grid grid-cols-8 border-b border-border/50">
             <div className="p-4 border-r border-border/50">
               <span className="text-xs text-muted-foreground">Time</span>
             </div>
-            {weekDays.map((day, index) => (
+            {weekDays.map((day) => (
               <div
                 key={day.toISOString()}
                 className={cn(
@@ -170,7 +166,7 @@ export default function Schedule() {
                 {/* Time Label */}
                 <div className="p-2 border-r border-border/50 flex items-start justify-end">
                   <span className="text-xs text-muted-foreground">
-                    {hour.toString().padStart(2, '0')}:00
+                    {hour === 0 ? '12:00 AM' : hour < 12 ? `${hour}:00 AM` : hour === 12 ? '12:00 PM' : `${hour - 12}:00 PM`}
                   </span>
                 </div>
                 
@@ -199,16 +195,28 @@ export default function Schedule() {
                       {hourEvents.map((event) => (
                         <div
                           key={event.id}
-                          className="relative z-10 p-2 text-xs border-l-2 bg-card rounded-lg shadow-soft mb-1"
-                          style={{ borderColor: getCategoryColor(event.category) }}
+                          className={cn(
+                            "relative z-10 p-2 text-xs border-l-2 bg-card rounded-lg shadow-soft mb-1 group/event",
+                            event.is_completed && "opacity-50"
+                          )}
+                          style={{ borderColor: getCategoryColor(event.category_id) }}
                         >
                           <div className="flex items-center gap-1 mb-1">
-                            {event.is_recurring && (
+                            {event.recurrence_type !== 'one_time' && (
                               <Repeat className="w-3 h-3 text-muted-foreground" />
                             )}
-                            <span className="font-medium text-foreground truncate">
+                            <span className={cn(
+                              "font-medium text-foreground truncate flex-1",
+                              event.is_completed && "line-through"
+                            )}>
                               {event.title}
                             </span>
+                            <button
+                              onClick={() => handleDeleteEvent(event.id)}
+                              className="opacity-0 group-hover/event:opacity-100 text-destructive hover:text-destructive/80 transition-opacity"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
                           </div>
                           <div className="flex items-center gap-1 text-muted-foreground">
                             <Clock className="w-3 h-3" />
@@ -227,15 +235,13 @@ export default function Schedule() {
         {/* Legend */}
         <div className="mt-6 flex flex-wrap items-center gap-4 text-xs animate-fade-in-up stagger-3">
           <span className="text-muted-foreground">Categories:</span>
-          {['Physical', 'Social', 'Financial', 'Career', 'Mental'].map((cat) => (
-            <div key={cat} className="flex items-center gap-2">
+          {categories.filter(c => c.is_preset).map((cat) => (
+            <div key={cat.id} className="flex items-center gap-2">
               <div 
                 className="w-3 h-3 rounded-full"
-                style={{ 
-                  backgroundColor: getCategoryColor(cat),
-                }}
+                style={{ backgroundColor: cat.color }}
               />
-              <span className="text-muted-foreground">{cat}</span>
+              <span className="text-muted-foreground">{cat.name}</span>
             </div>
           ))}
         </div>
@@ -259,7 +265,7 @@ export default function Schedule() {
             <button 
               className="btn-primary text-xs py-2 px-4 rounded-full"
               onClick={() => toast({
-                title: 'Coming Soon! 🚀',
+                title: 'Coming Soon',
                 description: 'Google Calendar integration will be available soon.'
               })}
             >
