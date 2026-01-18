@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Check, ChevronDown, ChevronUp, Trash2, Calendar, Target, Sparkles } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Check, ChevronDown, Trash2, Calendar, Target, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
+import SplashAnimation from '@/components/animations/SplashAnimation';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 interface Task {
   id: string;
@@ -35,18 +36,57 @@ export default function GoalCard({
   onDeleteGoal
 }: GoalCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [splashTaskId, setSplashTaskId] = useState<string | null>(null);
+  const [goalSplash, setGoalSplash] = useState(false);
+  const [bouncingTaskId, setBouncingTaskId] = useState<string | null>(null);
+  const { playDroplet, playSplash, playSuccess } = useSoundEffects();
+  
   const isComplete = progress === 100;
   const completedTasks = tasks.filter(t => t.is_completed).length;
+
+  const handleToggleTask = useCallback((taskId: string, wasCompleted: boolean) => {
+    // Trigger animations and sounds for completing (not uncompleting)
+    if (!wasCompleted) {
+      setSplashTaskId(taskId);
+      setBouncingTaskId(taskId);
+      playDroplet();
+      
+      // Check if this completion will complete the goal
+      const newCompletedCount = completedTasks + 1;
+      if (newCompletedCount === tasks.length && tasks.length > 0) {
+        setTimeout(() => {
+          setGoalSplash(true);
+          playSplash();
+          playSuccess();
+        }, 300);
+      }
+      
+      // Clear bounce after animation
+      setTimeout(() => setBouncingTaskId(null), 400);
+    }
+    
+    onToggleTask(taskId);
+  }, [completedTasks, tasks.length, onToggleTask, playDroplet, playSplash, playSuccess]);
 
   return (
     <div 
       className={cn(
-        "relative border transition-all duration-500 group overflow-hidden",
+        "relative border transition-all duration-500 group overflow-hidden rounded-3xl",
         isComplete 
-          ? "border-primary/60 bg-primary/5" 
+          ? "border-primary/60 bg-primary/5 goal-complete-glow" 
           : "border-primary/30 hover:border-primary/50"
       )}
     >
+      {/* Goal completion splash */}
+      {goalSplash && (
+        <SplashAnimation 
+          isActive={goalSplash} 
+          color={categoryColor}
+          size="large"
+          onComplete={() => setGoalSplash(false)}
+        />
+      )}
+
       {/* Completion celebration effect */}
       {isComplete && (
         <div className="absolute inset-0 pointer-events-none">
@@ -58,13 +98,13 @@ export default function GoalCard({
       )}
 
       {/* Progress bar at top */}
-      <div className="h-1 bg-muted/30">
+      <div className="h-1.5 bg-muted/30 rounded-t-3xl overflow-hidden">
         <div 
           className="h-full transition-all duration-700 ease-out"
           style={{ 
             width: `${progress}%`,
-            background: `linear-gradient(90deg, ${categoryColor}, hsl(var(--primary)))`,
-            boxShadow: progress > 50 ? `0 0 10px ${categoryColor}` : 'none'
+            background: `linear-gradient(90deg, ${categoryColor}, hsl(var(--primary)), hsl(var(--accent)))`,
+            boxShadow: progress > 50 ? `0 0 12px ${categoryColor}` : 'none'
           }}
         />
       </div>
@@ -77,7 +117,7 @@ export default function GoalCard({
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <span 
-              className="px-2.5 py-1 text-xs border transition-all duration-300 hover:scale-105"
+              className="px-2.5 py-1 text-xs rounded-full border transition-all duration-300 hover:scale-105"
               style={{ 
                 borderColor: categoryColor, 
                 color: categoryColor,
@@ -178,16 +218,27 @@ export default function GoalCard({
               {tasks.map((task, index) => (
                 <li 
                   key={task.id} 
-                  className="flex items-center gap-3 group/task"
+                  className="flex items-center gap-3 group/task relative"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
+                  {/* Splash animation for this task */}
+                  {splashTaskId === task.id && (
+                    <SplashAnimation 
+                      isActive={true} 
+                      color={categoryColor}
+                      size="small"
+                      onComplete={() => setSplashTaskId(null)}
+                    />
+                  )}
+                  
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onToggleTask(task.id);
+                      handleToggleTask(task.id, task.is_completed);
                     }}
                     className={cn(
-                      'w-6 h-6 border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95',
+                      'w-6 h-6 border-2 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95',
+                      bouncingTaskId === task.id && 'task-complete-bounce',
                       task.is_completed
                         ? 'border-primary bg-primary text-primary-foreground rotate-0'
                         : 'border-muted-foreground/50 hover:border-primary group-hover/task:border-primary/70'
@@ -222,7 +273,7 @@ export default function GoalCard({
                 e.stopPropagation();
                 onDeleteGoal(id);
               }}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-all duration-300 hover:scale-105 active:scale-95 px-3 py-1.5 border border-transparent hover:border-destructive/30 rounded"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-all duration-300 hover:scale-105 active:scale-95 px-3 py-1.5 border border-transparent hover:border-destructive/30 rounded-xl"
             >
               <Trash2 className="w-3.5 h-3.5" />
               DELETE
