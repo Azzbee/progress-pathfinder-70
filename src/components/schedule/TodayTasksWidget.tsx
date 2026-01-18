@@ -3,6 +3,7 @@ import { Check, Clock, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import SplashAnimation from '@/components/animations/SplashAnimation';
 
 interface TodayTask {
@@ -23,15 +24,20 @@ interface TodayTasksWidgetProps {
 export default function TodayTasksWidget({ tasks = [], onToggleTask }: TodayTasksWidgetProps) {
   const [splashTaskId, setSplashTaskId] = useState<string | null>(null);
   const { playDroplet, playSuccess } = useSoundEffects();
+  const { mediumTap, successPattern } = useHapticFeedback();
 
   const handleToggle = (taskId: string, wasCompleted: boolean) => {
     if (!wasCompleted) {
       setSplashTaskId(taskId);
       playDroplet();
+      mediumTap(); // Haptic feedback for task completion
       
       const completedCount = tasks.filter(t => t.isCompleted).length + 1;
       if (completedCount === tasks.length) {
-        setTimeout(() => playSuccess(), 300);
+        setTimeout(() => {
+          playSuccess();
+          successPattern(); // Haptic pattern for all tasks complete
+        }, 300);
       }
     }
     onToggleTask(taskId);
