@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import CreateEventDialog from '@/components/schedule/CreateEventDialog';
+import EditEventDialog from '@/components/schedule/EditEventDialog';
 import TodayTasksWidget from '@/components/schedule/TodayTasksWidget';
 import { useEvents } from '@/hooks/useEvents';
 import { useGoals } from '@/hooks/useGoals';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, startOfWeek, endOfWeek, addDays } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat, ExternalLink, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Plus, Repeat, ExternalLink, Trash2, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const HOUR_SLOTS = Array.from({ length: 24 }, (_, i) => i); // 12am to 11pm (24 hours)
@@ -17,7 +18,8 @@ export default function Schedule() {
   const { 
     events, 
     loading, 
-    createEvent, 
+    createEvent,
+    updateEvent, 
     deleteEvent, 
     toggleEventComplete,
     refetch 
@@ -63,18 +65,32 @@ export default function Schedule() {
       category_id: eventData.category_id,
       recurrence_type: eventData.recurrence_type as 'one_time' | 'daily' | 'weekly'
     });
-    toast({
-      title: 'Event Created',
-      description: `"${eventData.title}" has been scheduled.`
-    });
+  };
+
+  const handleUpdateEvent = async (eventId: string, updates: {
+    title: string;
+    description: string;
+    event_date: string;
+    start_time: string;
+    end_time: string;
+    category_id: string;
+    recurrence_type: 'one_time' | 'daily' | 'weekly';
+  }) => {
+    await updateEvent(eventId, updates);
   };
 
   const handleDeleteEvent = async (eventId: string) => {
     await deleteEvent(eventId);
-    toast({
-      title: 'Event Deleted',
-      description: 'The event has been removed.'
-    });
+  };
+
+  // Format recurrence type for display
+  const formatRecurrence = (type: string) => {
+    switch (type) {
+      case 'one_time': return 'One Time';
+      case 'daily': return 'Daily';
+      case 'weekly': return 'Weekly';
+      default: return type;
+    }
   };
 
   // Get today's events for the widget - transform to TodayTask format
@@ -231,12 +247,24 @@ export default function Schedule() {
                             )}>
                               {event.title}
                             </span>
-                            <button
-                              onClick={() => handleDeleteEvent(event.id)}
-                              className="opacity-0 group-hover/event:opacity-100 text-destructive hover:text-destructive/80 transition-opacity"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                            <div className="opacity-0 group-hover/event:opacity-100 flex items-center gap-1 transition-opacity">
+                              <EditEventDialog
+                                event={event}
+                                categories={categories}
+                                onUpdateEvent={handleUpdateEvent}
+                                trigger={
+                                  <button className="text-muted-foreground hover:text-primary transition-colors">
+                                    <Edit className="w-3 h-3" />
+                                  </button>
+                                }
+                              />
+                              <button
+                                onClick={() => handleDeleteEvent(event.id)}
+                                className="text-destructive hover:text-destructive/80 transition-colors"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
                           </div>
                           <div className="flex items-center gap-1 text-muted-foreground">
                             <Clock className="w-3 h-3" />

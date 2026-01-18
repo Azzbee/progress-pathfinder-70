@@ -159,6 +159,46 @@ export function useEvents() {
     setEvents(events.filter(e => e.id !== eventId));
   };
 
+  const updateEvent = async (eventId: string, updates: {
+    title: string;
+    description: string;
+    event_date: string;
+    start_time: string;
+    end_time: string;
+    category_id: string;
+    recurrence_type: 'one_time' | 'daily' | 'weekly';
+  }) => {
+    const { error } = await supabase
+      .from('events')
+      .update({
+        title: updates.title,
+        description: updates.description || null,
+        event_date: updates.event_date,
+        start_time: updates.start_time,
+        end_time: updates.end_time,
+        category_id: updates.category_id,
+        recurrence_type: updates.recurrence_type,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', eventId);
+
+    if (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update event',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'Event Updated',
+      description: 'Your changes have been saved.'
+    });
+
+    fetchEvents();
+  };
+
   const getEventsForDay = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayOfWeek = date.getDay();
@@ -197,6 +237,7 @@ export function useEvents() {
     weekStart,
     weekEnd,
     createEvent,
+    updateEvent,
     toggleEventComplete,
     deleteEvent,
     getEventsForDay,
