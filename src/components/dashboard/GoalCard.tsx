@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Check, ChevronDown, Trash2, Calendar, Target, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SplashAnimation from '@/components/animations/SplashAnimation';
+import ConfettiAnimation from '@/components/animations/ConfettiAnimation';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 interface Task {
@@ -38,6 +39,7 @@ export default function GoalCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const [splashTaskId, setSplashTaskId] = useState<string | null>(null);
   const [goalSplash, setGoalSplash] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [bouncingTaskId, setBouncingTaskId] = useState<string | null>(null);
   const { playDroplet, playSplash, playSuccess } = useSoundEffects();
   
@@ -56,6 +58,7 @@ export default function GoalCard({
       if (newCompletedCount === tasks.length && tasks.length > 0) {
         setTimeout(() => {
           setGoalSplash(true);
+          setShowConfetti(true);
           playSplash();
           playSuccess();
         }, 300);
@@ -77,6 +80,12 @@ export default function GoalCard({
           : "border-white/40 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)]"
       )}
     >
+      {/* Confetti celebration */}
+      <ConfettiAnimation 
+        isActive={showConfetti} 
+        onComplete={() => setShowConfetti(false)} 
+      />
+
       {/* Goal completion splash */}
       {goalSplash && (
         <SplashAnimation 
