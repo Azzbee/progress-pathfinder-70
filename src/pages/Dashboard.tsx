@@ -4,8 +4,7 @@ import GoalCard from '@/components/dashboard/GoalCard';
 import CreateGoalDialog from '@/components/dashboard/CreateGoalDialog';
 import CategoryHealthBars from '@/components/dashboard/CategoryHealthBars';
 import { useGoals } from '@/hooks/useGoals';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Target, Sparkles, MessageCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -42,56 +41,61 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+        {/* Header with premium styling */}
+        <div className="flex items-center justify-between animate-fade-in-up">
           <div>
-            <h1 className="heading-display text-3xl text-primary">
+            <h1 className="heading-display text-3xl gradient-text text-depth">
               Goal Planner
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Track your objectives across all areas of life
+              Track your objectives across all areas of life ✨
             </p>
           </div>
           <CreateGoalDialog categories={categories} onCreateGoal={createGoal} />
         </div>
 
         {/* Goals List */}
-        <div>
+        <div className="animate-fade-in-up stagger-1">
           <h2 className="heading-display text-xl text-foreground mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-primary" />
+            <span className="text-2xl">🎯</span>
             Active Goals
           </h2>
           
           {goalsLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-24 bg-muted rounded-3xl" />
+                <div key={i} className="h-24 bg-muted/30 rounded-3xl shimmer-effect" />
               ))}
             </div>
           ) : goals.length > 0 ? (
             <div className="space-y-4">
-              {goals.map(goal => (
-                <GoalCard
-                  key={goal.id}
-                  id={goal.id}
-                  title={goal.title}
-                  description={goal.description || undefined}
-                  progress={goal.progress}
-                  categoryName={goal.category?.name || 'Uncategorized'}
-                  categoryColor={goal.category?.color || 'hsl(200 85% 55%)'}
-                  targetDate={goal.target_date || undefined}
-                  tasks={goal.tasks}
-                  onToggleTask={toggleTask}
-                  onDeleteGoal={deleteGoal}
-                />
+              {goals.map((goal, index) => (
+                <div 
+                  key={goal.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.08}s` }}
+                >
+                  <GoalCard
+                    id={goal.id}
+                    title={goal.title}
+                    description={goal.description || undefined}
+                    progress={goal.progress}
+                    categoryName={goal.category?.name || 'Uncategorized'}
+                    categoryColor={goal.category?.color || 'hsl(195 90% 48%)'}
+                    targetDate={goal.target_date || undefined}
+                    tasks={goal.tasks}
+                    onToggleTask={toggleTask}
+                    onDeleteGoal={deleteGoal}
+                  />
+                </div>
               ))}
             </div>
           ) : (
-            <div className="glass-card rounded-3xl p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-primary" />
+            <div className="glass-premium rounded-3xl p-10 text-center hover-lift">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-5 glow-pulse">
+                <Sparkles className="w-10 h-10 text-primary" />
               </div>
-              <p className="text-foreground font-display text-lg mb-2">
+              <p className="text-foreground font-display text-xl mb-2 gradient-text">
                 Ready to start your journey?
               </p>
               <p className="text-muted-foreground text-sm">
@@ -102,19 +106,24 @@ export default function Dashboard() {
         </div>
 
         {/* Category Health Bars */}
-        <CategoryHealthBars categories={getCategoryData()} />
+        <div className="animate-fade-in-up stagger-2">
+          <CategoryHealthBars categories={getCategoryData()} />
+        </div>
 
-        {/* AI Coach Link */}
+        {/* AI Coach Link - Premium styled */}
         <button
           onClick={() => navigate('/ai-coach')}
-          className="w-full glass-card p-4 rounded-2xl flex items-center gap-3 hover:border-primary/50 transition-all group"
+          className="w-full glass-premium p-5 rounded-3xl flex items-center gap-4 hover-lift group animate-fade-in-up stagger-3"
         >
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-            <MessageCircle className="w-5 h-5 text-primary" />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <span className="text-2xl">🤖</span>
           </div>
-          <div className="text-left">
-            <p className="text-foreground font-medium">Need help with goals?</p>
-            <p className="text-xs text-muted-foreground">Talk to AI Coach for personalized guidance</p>
+          <div className="text-left flex-1">
+            <p className="text-foreground font-semibold text-lg">Need help with goals?</p>
+            <p className="text-sm text-muted-foreground">Talk to AI Coach for personalized guidance</p>
+          </div>
+          <div className="text-primary text-2xl group-hover:translate-x-1 transition-transform">
+            →
           </div>
         </button>
       </div>
