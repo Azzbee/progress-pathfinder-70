@@ -410,6 +410,7 @@ export type Database = {
           language: string | null
           notifications_enabled: boolean | null
           sound_enabled: boolean | null
+          theme: string | null
           updated_at: string | null
           user_id: string
         }
@@ -422,6 +423,7 @@ export type Database = {
           language?: string | null
           notifications_enabled?: boolean | null
           sound_enabled?: boolean | null
+          theme?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -434,6 +436,7 @@ export type Database = {
           language?: string | null
           notifications_enabled?: boolean | null
           sound_enabled?: boolean | null
+          theme?: string | null
           updated_at?: string | null
           user_id?: string
         }

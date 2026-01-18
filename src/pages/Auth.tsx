@@ -5,6 +5,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { Sparkles, Heart, Target, Flame } from 'lucide-react';
@@ -17,6 +18,9 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [rememberMe, setRememberMe] = useState(() => {
+    return localStorage.getItem('rememberMe') === 'true';
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
@@ -59,6 +63,9 @@ export default function Auth() {
     if (!validate()) return;
     
     setIsSubmitting(true);
+    
+    // Save remember me preference
+    localStorage.setItem('rememberMe', rememberMe.toString());
     
     try {
       if (isLogin) {
@@ -188,6 +195,23 @@ export default function Auth() {
                 <p className="text-destructive text-sm">{errors.password}</p>
               )}
             </div>
+
+            {/* Remember Me */}
+            {isLogin && (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember-me"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                />
+                <Label 
+                  htmlFor="remember-me" 
+                  className="text-sm text-muted-foreground cursor-pointer"
+                >
+                  Stay signed in
+                </Label>
+              </div>
+            )}
 
             <Button
               type="submit"

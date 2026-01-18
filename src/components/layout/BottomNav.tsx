@@ -10,6 +10,7 @@ const navItems = [
   { icon: Award, path: '/discipline', label: 'Discipline' },
   { icon: Trophy, path: '/leaderboard', label: 'Leaderboard' },
   { icon: MessageCircle, path: '/ai-coach', label: 'AI Coach' },
+  { icon: Settings, path: '/settings', label: 'Settings' },
 ];
 
 export default function BottomNav() {

@@ -9,6 +9,7 @@ export interface UserSettings {
   ambient_audio_volume: number;
   language: string;
   notifications_enabled: boolean;
+  theme: 'softer' | 'hacker';
 }
 
 const defaultSettings: UserSettings = {
@@ -17,7 +18,8 @@ const defaultSettings: UserSettings = {
   ambient_audio_enabled: false,
   ambient_audio_volume: 0.3,
   language: 'en',
-  notifications_enabled: true
+  notifications_enabled: true,
+  theme: 'softer'
 };
 
 interface UserSettingsContextType {
@@ -62,7 +64,8 @@ export function UserSettingsProvider({ children }: { children: React.ReactNode }
         ambient_audio_enabled: data.ambient_audio_enabled ?? defaultSettings.ambient_audio_enabled,
         ambient_audio_volume: Number(data.ambient_audio_volume) ?? defaultSettings.ambient_audio_volume,
         language: data.language ?? defaultSettings.language,
-        notifications_enabled: data.notifications_enabled ?? defaultSettings.notifications_enabled
+        notifications_enabled: data.notifications_enabled ?? defaultSettings.notifications_enabled,
+        theme: ((data as any).theme as UserSettings['theme']) ?? defaultSettings.theme
       });
     }
 
