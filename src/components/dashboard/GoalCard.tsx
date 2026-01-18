@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import SplashAnimation from '@/components/animations/SplashAnimation';
 import ConfettiAnimation from '@/components/animations/ConfettiAnimation';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface Task {
   id: string;
@@ -42,6 +43,7 @@ export default function GoalCard({
   const [showConfetti, setShowConfetti] = useState(false);
   const [bouncingTaskId, setBouncingTaskId] = useState<string | null>(null);
   const { playDroplet, playSplash, playSuccess } = useSoundEffects();
+  const { mediumTap, successPattern } = useHapticFeedback();
   
   const isComplete = progress === 100;
   const completedTasks = tasks.filter(t => t.is_completed).length;
@@ -52,6 +54,7 @@ export default function GoalCard({
       setSplashTaskId(taskId);
       setBouncingTaskId(taskId);
       playDroplet();
+      mediumTap(); // Haptic feedback for task completion
       
       // Check if this completion will complete the goal
       const newCompletedCount = completedTasks + 1;
@@ -61,6 +64,7 @@ export default function GoalCard({
           setShowConfetti(true);
           playSplash();
           playSuccess();
+          successPattern(); // Haptic pattern for goal completion
         }, 300);
       }
       
@@ -69,7 +73,7 @@ export default function GoalCard({
     }
     
     onToggleTask(taskId);
-  }, [completedTasks, tasks.length, onToggleTask, playDroplet, playSplash, playSuccess]);
+  }, [completedTasks, tasks.length, onToggleTask, playDroplet, playSplash, playSuccess, mediumTap, successPattern]);
 
   return (
     <div 
