@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -13,7 +15,8 @@ import {
   MessageCircle,
   Check,
   Crown,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -143,6 +146,7 @@ type OnboardingStep = 'welcome' | 'survey' | 'complete' | 'tutorial' | 'motivati
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { saveResponses, completeOnboarding, skipOnboarding } = useOnboarding();
   
   const [step, setStep] = useState<OnboardingStep>('welcome');
@@ -151,6 +155,7 @@ export default function Onboarding() {
   const [motivationStep, setMotivationStep] = useState(0);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const handleAnswer = (questionId: string, value: any) => {
     const newAnswers = { ...answers, [questionId]: value };
@@ -180,6 +185,43 @@ export default function Onboarding() {
   const handleSkip = async () => {
     await skipOnboarding();
     navigate('/dashboard');
+  };
+
+  const handlePlanSelection = async () => {
+    if (!selectedPlan) return;
+
+    if (selectedPlan === 'free') {
+      // Free plan - just complete onboarding
+      await handleComplete();
+    } else {
+      // Pro plan - create Stripe checkout session
+      setIsProcessingPayment(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('create-checkout');
+        
+        if (error) {
+          throw error;
+        }
+
+        if (data?.url) {
+          // Complete onboarding first, then redirect to Stripe
+          await completeOnboarding();
+          window.open(data.url, '_blank');
+          navigate('/dashboard');
+        } else {
+          throw new Error('No checkout URL received');
+        }
+      } catch (error) {
+        console.error('Checkout error:', error);
+        toast({
+          title: 'Payment Error',
+          description: 'Unable to start checkout. Please try again.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsProcessingPayment(false);
+      }
+    }
   };
 
   const nextTutorialStep = () => {
@@ -434,6 +476,7 @@ export default function Onboarding() {
               {/* Free Trial */}
               <button
                 onClick={() => setSelectedPlan('free')}
+                disabled={isProcessingPayment}
                 className={cn(
                   'glass-card rounded-3xl p-6 text-left transition-all border-2',
                   selectedPlan === 'free' 
@@ -473,6 +516,7 @@ export default function Onboarding() {
               {/* Pro Version */}
               <button
                 onClick={() => setSelectedPlan('pro')}
+                disabled={isProcessingPayment}
                 className={cn(
                   'glass-card rounded-3xl p-6 text-left transition-all border-2 relative overflow-hidden',
                   selectedPlan === 'pro' 
@@ -508,12 +552,21 @@ export default function Onboarding() {
             </div>
 
             <Button 
-              onClick={handleComplete} 
-              disabled={!selectedPlan}
+              onClick={handlePlanSelection} 
+              disabled={!selectedPlan || isProcessingPayment}
               className="w-full"
             >
-              {selectedPlan === 'pro' ? 'Start Pro Trial' : selectedPlan === 'free' ? 'Start Free Trial' : 'Select a Plan'}
-              <ArrowRight className="w-4 h-4 ml-2" />
+              {isProcessingPayment ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {selectedPlan === 'pro' ? 'Start Pro Trial' : selectedPlan === 'free' ? 'Start Free Trial' : 'Select a Plan'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center mt-4">

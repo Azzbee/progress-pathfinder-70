@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -22,9 +23,12 @@ const suggestedPrompts = [
   "Give me tips for building a morning routine"
 ];
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach`;
+
 export default function AICoach() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,6 +72,96 @@ export default function AICoach() {
     setInitialLoading(false);
   };
 
+  const streamChat = async (userContent: string, chatHistory: Message[]) => {
+    const response = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({
+        messages: [
+          ...chatHistory.slice(-10).map(m => ({ role: m.role, content: m.content })),
+          { role: 'user', content: userContent }
+        ]
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        toast({
+          title: "Rate limit exceeded",
+          description: "Please wait a moment and try again.",
+          variant: "destructive"
+        });
+        throw new Error("Rate limit exceeded");
+      }
+      if (response.status === 402) {
+        toast({
+          title: "AI usage limit reached",
+          description: "Please try again later.",
+          variant: "destructive"
+        });
+        throw new Error("AI usage limit reached");
+      }
+      throw new Error("Failed to start stream");
+    }
+
+    if (!response.body) throw new Error("No response body");
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = "";
+    let assistantContent = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+          if (content) {
+            assistantContent += content;
+            // Update the last assistant message content
+            setMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last?.role === "assistant") {
+                return prev.map((m, i) => 
+                  i === prev.length - 1 ? { ...m, content: assistantContent } : m
+                );
+              }
+              return [...prev, {
+                id: crypto.randomUUID(),
+                role: 'assistant' as const,
+                content: assistantContent,
+                created_at: new Date().toISOString()
+              }];
+            });
+          }
+        } catch {
+          textBuffer = line + "\n" + textBuffer;
+          break;
+        }
+      }
+    }
+
+    return assistantContent;
+  };
+
   const sendMessage = async (content: string) => {
     if (!user || !content.trim() || loading) return;
 
@@ -90,34 +184,16 @@ export default function AICoach() {
     });
 
     try {
-      // Call the AI coach edge function
-      const { data, error } = await supabase.functions.invoke('ai-coach', {
-        body: {
-          message: content.trim(),
-          history: messages.slice(-10).map(m => ({
-            role: m.role,
-            content: m.content
-          }))
-        }
-      });
-
-      if (error) throw error;
-
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: data.response || "I'm here to help you achieve your goals. What would you like to work on?",
-        created_at: new Date().toISOString()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      const assistantContent = await streamChat(content.trim(), messages);
 
       // Save assistant message to database
-      await supabase.from('ai_chat_messages').insert({
-        user_id: user.id,
-        role: 'assistant',
-        content: assistantMessage.content
-      });
+      if (assistantContent) {
+        await supabase.from('ai_chat_messages').insert({
+          user_id: user.id,
+          role: 'assistant',
+          content: assistantContent
+        });
+      }
     } catch (error) {
       console.error('Error calling AI:', error);
       const errorMessage: Message = {
@@ -126,7 +202,11 @@ export default function AICoach() {
         content: "I'm having trouble connecting right now. Please try again in a moment.",
         created_at: new Date().toISOString()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => {
+        // Remove any partial assistant message and add error
+        const filtered = prev.filter((m, i) => !(i === prev.length - 1 && m.role === 'assistant' && !m.content));
+        return [...filtered, errorMessage];
+      });
     }
 
     setLoading(false);
@@ -216,7 +296,7 @@ export default function AICoach() {
                     </div>
                   </div>
                 ))}
-                {loading && (
+                {loading && messages[messages.length - 1]?.role !== 'assistant' && (
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
                       <Bot className="w-4 h-4 text-accent" />
