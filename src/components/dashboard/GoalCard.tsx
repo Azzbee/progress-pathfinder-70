@@ -71,10 +71,10 @@ export default function GoalCard({
   return (
     <div 
       className={cn(
-        "relative border transition-all duration-500 group overflow-hidden rounded-3xl",
+        "relative border transition-all duration-500 group overflow-hidden rounded-3xl glass-premium",
         isComplete 
-          ? "border-primary/60 bg-primary/5 goal-complete-glow" 
-          : "border-primary/30 hover:border-primary/50"
+          ? "border-primary/60 bg-gradient-to-br from-primary/5 to-accent/5 goal-complete-glow" 
+          : "border-white/40 hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)]"
       )}
     >
       {/* Goal completion splash */}

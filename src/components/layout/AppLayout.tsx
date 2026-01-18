@@ -24,7 +24,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Caustics light pattern overlay */}
       <div className="fixed inset-0 caustics-pattern pointer-events-none z-0" />
       
-      <main className="flex-1 p-4 overflow-auto relative z-10 pb-24">
+      {/* Top gradient glow */}
+      <div className="fixed top-0 left-0 right-0 h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0" />
+      
+      <main className="flex-1 p-4 pt-6 overflow-auto relative z-10 pb-28">
         <div className="max-w-6xl mx-auto">
           {children}
         </div>
