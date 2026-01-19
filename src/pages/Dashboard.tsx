@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import GoalCard from '@/components/dashboard/GoalCard';
 import CreateGoalDialog from '@/components/dashboard/CreateGoalDialog';
 import CategoryHealthBars from '@/components/dashboard/CategoryHealthBars';
+import XPLevelBar from '@/components/dashboard/XPLevelBar';
+import AnimatedEmptyState from '@/components/dashboard/AnimatedEmptyState';
 import { useGoals } from '@/hooks/useGoals';
-import { Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -54,6 +54,11 @@ export default function Dashboard() {
           <CreateGoalDialog categories={categories} onCreateGoal={createGoal} />
         </div>
 
+        {/* XP Level Bar */}
+        <div className="animate-fade-in-up">
+          <XPLevelBar />
+        </div>
+
         {/* Goals List */}
         <div className="animate-fade-in-up stagger-1">
           <h2 className="heading-display text-xl text-foreground mb-4 flex items-center gap-2">
@@ -91,17 +96,7 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="glass-premium rounded-3xl p-10 text-center hover-lift">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-5 glow-pulse">
-                <Sparkles className="w-10 h-10 text-primary" />
-              </div>
-              <p className="text-foreground font-display text-xl mb-2 gradient-text">
-                Ready to start your journey?
-              </p>
-              <p className="text-muted-foreground text-sm">
-                Create your first goal to begin tracking your progress.
-              </p>
-            </div>
+            <AnimatedEmptyState categories={categories} onCreateGoal={createGoal} />
           )}
         </div>
 

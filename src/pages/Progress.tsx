@@ -1,6 +1,7 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { useStreak } from '@/hooks/useStreak';
+import ContributionHeatmap from '@/components/progress/ContributionHeatmap';
 import { format } from 'date-fns';
 import { TrendingUp, TrendingDown, Activity, Target, Flame, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -260,6 +261,9 @@ export default function Progress() {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Contribution Heatmap */}
+        <ContributionHeatmap data={dailyProgress} weeks={timeRange === '7d' ? 8 : timeRange === '30d' ? 16 : 20} />
 
         {/* Summary Stats (MOVED TO BOTTOM) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fade-in-up stagger-3">

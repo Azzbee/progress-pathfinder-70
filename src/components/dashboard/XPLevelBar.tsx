@@ -1,8 +1,12 @@
 import { cn } from '@/lib/utils';
-import { Zap, Star, Trophy, Crown, Sparkles } from 'lucide-react';
+import { Zap, Star, Crown, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { format, startOfDay, subDays } from 'date-fns';
 
 interface XPLevelBarProps {
-  totalXP: number;
+  totalXP?: number;
   dailyXP?: number;
 }
 
@@ -44,9 +48,65 @@ const getLevelInfo = (xp: number) => {
   return { ...levels[0], progress: 0, xpToNext: 100, nextLevel: levels[1] };
 };
 
-export default function XPLevelBar({ totalXP, dailyXP = 0 }: XPLevelBarProps) {
+export default function XPLevelBar({ totalXP: propTotalXP, dailyXP: propDailyXP }: XPLevelBarProps) {
+  const { user } = useAuth();
+  const [calculatedXP, setCalculatedXP] = useState({ total: 0, daily: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchXP = async () => {
+      if (!user) return;
+
+      // Fetch all completions to calculate XP
+      const { data: completions } = await supabase
+        .from('daily_completions')
+        .select('goals_completed, date')
+        .eq('user_id', user.id);
+
+      // Fetch streak data
+      const { data: streakData } = await supabase
+        .from('streaks')
+        .select('current_streak')
+        .eq('user_id', user.id)
+        .single();
+
+      const today = format(new Date(), 'yyyy-MM-dd');
+      let totalXP = 0;
+      let dailyXP = 0;
+
+      (completions || []).forEach(c => {
+        // 10 XP per task, 50 XP bonus per goal (estimated as completed tasks)
+        const xp = (c.goals_completed || 0) * 50;
+        totalXP += xp;
+        if (c.date === today) {
+          dailyXP = xp;
+        }
+      });
+
+      // Streak bonus
+      const streakBonus = (streakData?.current_streak || 0) * 25;
+      totalXP += streakBonus;
+
+      setCalculatedXP({ total: totalXP, daily: dailyXP });
+      setLoading(false);
+    };
+
+    fetchXP();
+  }, [user]);
+
+  const totalXP = propTotalXP ?? calculatedXP.total;
+  const dailyXP = propDailyXP ?? calculatedXP.daily;
   const levelInfo = getLevelInfo(totalXP);
   const isMaxLevel = levelInfo.level >= 50;
+
+  if (loading && !propTotalXP) {
+    return (
+      <div className="glass-premium rounded-3xl p-6 animate-pulse">
+        <div className="h-12 bg-muted/30 rounded-xl mb-4" />
+        <div className="h-4 bg-muted/30 rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="glass-premium rounded-3xl p-6 overflow-hidden relative group">

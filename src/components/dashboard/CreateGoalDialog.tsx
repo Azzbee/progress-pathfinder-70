@@ -23,9 +23,10 @@ interface CreateGoalDialogProps {
     is_daily: boolean;
     tasks: string[];
   }) => void;
+  trigger?: React.ReactNode;
 }
 
-export default function CreateGoalDialog({ categories, onCreateGoal }: CreateGoalDialogProps) {
+export default function CreateGoalDialog({ categories, onCreateGoal, trigger }: CreateGoalDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [howTo, setHowTo] = useState('');
@@ -72,10 +73,12 @@ export default function CreateGoalDialog({ categories, onCreateGoal }: CreateGoa
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
-          <Plus className="w-4 h-4 mr-2" />
-          New Goal
-        </Button>
+        {trigger || (
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
+            <Plus className="w-4 h-4 mr-2" />
+            New Goal
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="bg-card border-border max-w-lg">
         <DialogHeader>
