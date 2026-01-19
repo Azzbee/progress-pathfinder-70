@@ -1,24 +1,37 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { 
+  Home, 
+  Target, 
+  Calendar, 
+  TrendingUp, 
+  Trophy, 
+  Bot, 
+  Settings 
+} from 'lucide-react';
 
+// Custom illustrated icons with Lucide components
 const navItems = [
-  { path: '/', label: 'Goals', emoji: '🎯' },
-  { path: '/schedule', label: 'Schedule', emoji: '📅' },
-  { path: '/progress', label: 'Progress', emoji: '📈' },
-  { path: '/discipline', label: 'Focus', emoji: '🧠' },
-  { path: '/leaderboard', label: 'Ranks', emoji: '🏆' },
-  { path: '/ai-coach', label: 'Coach', emoji: '🤖' },
-  { path: '/settings', label: 'Settings', emoji: '⚙️' },
+  { path: '/', label: 'Goals', Icon: Home },
+  { path: '/schedule', label: 'Schedule', Icon: Calendar },
+  { path: '/progress', label: 'Progress', Icon: TrendingUp },
+  { path: '/discipline', label: 'Focus', Icon: Target },
+  { path: '/leaderboard', label: 'Ranks', Icon: Trophy },
+  { path: '/ai-coach', label: 'Coach', Icon: Bot },
+  { path: '/settings', label: 'Settings', Icon: Settings },
 ];
 
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { playDroplet } = useSoundEffects();
+  const { lightTap } = useHapticFeedback();
 
   const handleNavClick = (path: string) => {
     playDroplet();
+    lightTap();
     navigate(path);
   };
 
@@ -27,7 +40,7 @@ export default function BottomNav() {
       {/* Gradient fade effect at top */}
       <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
       
-      <div className="mx-2 mb-2 rounded-[28px] overflow-hidden backdrop-blur-2xl bg-white/70 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.5)_inset]">
+      <div className="mx-2 mb-2 rounded-[28px] overflow-hidden backdrop-blur-2xl bg-white/70 dark:bg-gray-900/70 border border-white/50 dark:border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.5)_inset]">
         {/* Inner glow effect */}
         <div className="absolute inset-0 rounded-[28px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
         
@@ -36,6 +49,8 @@ export default function BottomNav() {
           <div className="flex items-center justify-between min-w-max px-2 py-2 gap-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
+              const Icon = item.Icon;
+              
               return (
                 <button
                   key={item.path}
@@ -52,10 +67,16 @@ export default function BottomNav() {
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
                   )}
                   
-                  <span className={cn(
-                    "text-xl transition-transform duration-300",
-                    isActive && "animate-bounce-once"
-                  )}>{item.emoji}</span>
+                  {/* Icon with filled/outlined states */}
+                  <Icon 
+                    className={cn(
+                      "w-5 h-5 transition-all duration-300",
+                      isActive && "animate-bounce-once"
+                    )}
+                    fill={isActive ? "currentColor" : "none"}
+                    strokeWidth={isActive ? 1.5 : 2}
+                  />
+                  
                   <span className={cn(
                     'text-[10px] font-semibold tracking-wide transition-all duration-300',
                     isActive ? 'text-white/90' : 'opacity-70'
