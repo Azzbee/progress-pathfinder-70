@@ -230,6 +230,59 @@
   overflow: hidden;
 }
 
+/* Onboarding character animations */
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes think {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes confetti {
+  0% { 
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-100px) rotate(720deg) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes jump {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes cheer-left {
+  0%, 100% { transform: rotate(-15deg); }
+  50% { transform: rotate(-25deg); }
+}
+
+@keyframes cheer-right {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(25deg); }
+}
+
+@keyframes point {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+@keyframes bounce-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
 .ripple-effect::after {
   content: '';
   position: absolute;

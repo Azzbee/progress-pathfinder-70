@@ -16,10 +16,14 @@ import {
   Check,
   Crown,
   Zap,
-  Loader2
+  Loader2,
+  Rocket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import AnimatedCharacter from '@/components/onboarding/AnimatedCharacter';
+import XPExplainer from '@/components/onboarding/XPExplainer';
+import GoalCreationGuide from '@/components/onboarding/GoalCreationGuide';
 
 const surveyQuestions = [
   {
@@ -142,7 +146,7 @@ const proFeatures = [
   'AI Coaching Assistant'
 ];
 
-type OnboardingStep = 'welcome' | 'survey' | 'complete' | 'tutorial' | 'motivation' | 'paywall';
+type OnboardingStep = 'welcome' | 'survey' | 'complete' | 'tutorial' | 'xp-system' | 'goal-setup' | 'motivation' | 'paywall';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -228,7 +232,7 @@ export default function Onboarding() {
     if (tutorialStep < tutorialSteps.length - 1) {
       setTutorialStep(tutorialStep + 1);
     } else {
-      setStep('motivation');
+      setStep('xp-system');
     }
   };
 
@@ -248,9 +252,7 @@ export default function Onboarding() {
         {/* Welcome Step */}
         {step === 'welcome' && (
           <div className="glass-card rounded-3xl p-8 text-center animate-fade-in-up">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <Target className="w-10 h-10 text-primary" />
-            </div>
+            <AnimatedCharacter variant="welcome" className="mx-auto mb-6" />
             
             <h1 className="heading-display text-2xl text-foreground mb-4">
               Welcome to DisciplineOS
@@ -430,12 +432,46 @@ export default function Onboarding() {
           </div>
         )}
 
+        {/* XP System Explainer */}
+        {step === 'xp-system' && (
+          <div className="glass-card rounded-3xl p-8 animate-fade-in-up">
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="heading-display text-xl text-foreground mb-2">
+                Level Up Your Life
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Earn XP and climb the ranks as you build discipline
+              </p>
+            </div>
+            
+            <XPExplainer />
+            
+            <Button onClick={() => setStep('goal-setup')} className="w-full mt-6">
+              Set Your First Goal
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        )}
+
+        {/* Goal Creation Guide */}
+        {step === 'goal-setup' && (
+          <div className="glass-card rounded-3xl p-8 animate-fade-in-up">
+            <GoalCreationGuide 
+              onComplete={() => setStep('motivation')}
+              onSkip={() => setStep('motivation')}
+            />
+          </div>
+        )}
+
         {/* Motivation Step */}
         {step === 'motivation' && (
           <div className="glass-card rounded-3xl p-8 text-center animate-fade-in-up">
             {motivationStep === 0 ? (
               <>
-                <div className="text-6xl mb-6">📝</div>
+                <AnimatedCharacter variant="thinking" className="mx-auto mb-6" />
                 <h2 className="heading-display text-xl text-foreground mb-4">
                   People who write down goals are 42% more likely to achieve them
                 </h2>
@@ -449,7 +485,7 @@ export default function Onboarding() {
               </>
             ) : (
               <>
-                <div className="text-6xl mb-6">📊</div>
+                <AnimatedCharacter variant="celebrating" className="mx-auto mb-6" />
                 <h2 className="heading-display text-xl text-foreground mb-4">
                   People who track their goals are 72% more likely to achieve them
                 </h2>
