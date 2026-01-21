@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import RankCard from '@/components/leaderboard/RankCard';
 import CommunityPanel from '@/components/leaderboard/CommunityPanel';
+import RivalChallengePanel from '@/components/leaderboard/RivalChallengePanel';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoals } from '@/hooks/useGoals';
 import { useStreak } from '@/hooks/useStreak';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Trophy, Users, Globe, Filter, Medal, Award } from 'lucide-react';
+import { Trophy, Users, Globe, Filter, Medal, Award, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -35,7 +36,7 @@ export default function Leaderboard() {
   const { streak } = useStreak();
   const { toast } = useToast();
   
-  const [view, setView] = useState<'global' | 'community'>('global');
+  const [view, setView] = useState<'global' | 'rivals' | 'community'>('global');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
@@ -262,7 +263,7 @@ export default function Leaderboard() {
             <button
               onClick={() => setView('global')}
               className={cn(
-                "px-4 py-2 rounded-full border flex items-center gap-2 transition-all",
+                "px-3 py-2 rounded-full border flex items-center gap-1.5 transition-all",
                 view === 'global'
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50"
@@ -272,16 +273,28 @@ export default function Leaderboard() {
               <span className="text-xs">Global</span>
             </button>
             <button
+              onClick={() => setView('rivals')}
+              className={cn(
+                "px-3 py-2 rounded-full border flex items-center gap-1.5 transition-all",
+                view === 'rivals'
+                  ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                  : "border-border text-muted-foreground hover:border-orange-500/50"
+              )}
+            >
+              <Swords className="w-4 h-4" />
+              <span className="text-xs">Rivals</span>
+            </button>
+            <button
               onClick={() => setView('community')}
               className={cn(
-                "px-4 py-2 rounded-full border flex items-center gap-2 transition-all",
+                "px-3 py-2 rounded-full border flex items-center gap-1.5 transition-all",
                 view === 'community'
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50"
               )}
             >
               <Users className="w-4 h-4" />
-              <span className="text-xs">Communities</span>
+              <span className="text-xs">Groups</span>
             </button>
           </div>
         </div>
@@ -423,6 +436,13 @@ export default function Leaderboard() {
                 )}
               </>
             )}
+          </div>
+        ) : view === 'rivals' ? (
+          <div className="animate-fade-in-up">
+            <RivalChallengePanel 
+              leaderboard={leaderboard.map(e => ({ userId: e.userId, username: e.username, avatarUrl: e.avatarUrl, score: e.score }))}
+              onChallengeUpdate={fetchLeaderboard}
+            />
           </div>
         ) : (
           <div className="animate-fade-in-up">

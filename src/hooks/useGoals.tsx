@@ -94,11 +94,11 @@ export function useGoals() {
 
   const createGoal = async (goalData: {
     title: string;
-    description: string;
-    category_id: string;
-    target_date: string | null;
-    is_daily: boolean;
-    tasks: string[];
+    description?: string;
+    category_id?: string;
+    target_date?: string | null;
+    is_daily?: boolean;
+    tasks?: string[];
   }) => {
     if (!user) return;
 
@@ -126,7 +126,7 @@ export function useGoals() {
     }
 
     // Create tasks
-    if (goalData.tasks.length > 0) {
+    if (goalData.tasks && goalData.tasks.length > 0) {
       const tasksToInsert = goalData.tasks.map(title => ({
         goal_id: newGoal.id,
         user_id: user.id,
